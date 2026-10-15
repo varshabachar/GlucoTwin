@@ -1,0 +1,17 @@
+# raw and cached data (download from PhysioNet; never commit)
+data/raw/
+data/processed/
+data/demo/
+# python
+__pycache__/
+*.pyc
+venv/
+.venv/
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+# personal notes and archives
+GETTING_STARTED.md
+*.zip
