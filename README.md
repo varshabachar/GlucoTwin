@@ -313,7 +313,8 @@ streamlit run app/dashboard.py
   - a multi-day timeline of glucose, risk, HR, HRV, activity and sleep
   - the twin's personal parameters
   - the **what-if simulator** (meal size × post-meal walk)
-  - **🍽 Plan a meal** (section 8): pick a common Indian meal and an eating order, and see the projected
+  - **🍽 Plan a meal** (section 8): pick a common Indian meal **or build your own** (enter carbs,
+    fibre, protein and fat for any food), choose an eating order, and see the projected
     peak for *carbs first* / *mixed* / *vegetables & protein first*, with whether each crosses 140
   - **After the meal:** for every real meal, what the twin predicted *before* it was eaten, what the CGM
     actually recorded, and what a generic twin would have said instead

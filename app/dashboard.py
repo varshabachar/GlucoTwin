@@ -395,14 +395,39 @@ elif page == "Patient twin":
     if MENU.empty:
         st.warning("No meal menu found (data/indian_meals.csv).")
     else:
+        mode = st.radio("Meal source", ["Pick from the menu", "Build your own"], horizontal=True,
+                        help="Build your own lets you test any food, not just the ten in the menu.")
         pc1, pc2 = st.columns([2, 1])
-        choice = pc1.selectbox("Meal", MENU["name"].tolist(),
-                               help="Approximate values — see the header of data/indian_meals.csv")
-        item = MENU[MENU["name"] == choice].iloc[0]
+
+        if mode == "Pick from the menu":
+            choice = pc1.selectbox("Meal", MENU["name"].tolist(),
+                                   help="Approximate values — see the header of data/indian_meals.csv")
+            item = MENU[MENU["name"] == choice].iloc[0]
+            pc1.caption(f"**{item['serving']}** · {item['carbs_g']:.0f} g carbs "
+                        f"({item['net_carbs']:.0f} g net) · {item['fiber_g']:.0f} g fibre · "
+                        f"{item['protein_g']:.0f} g protein · {item['fat_g']:.0f} g fat")
+        else:
+            with pc1:
+                nm = st.text_input("What is the meal?", "My meal", key="own_name")
+                b1, b2, b3, b4 = st.columns(4)
+                c_g = b1.number_input("Carbs (g)", 0.0, 400.0, 60.0, 5.0, key="own_c")
+                f_g = b2.number_input("Fibre (g)", 0.0, 60.0, 5.0, 1.0, key="own_f")
+                p_g = b3.number_input("Protein (g)", 0.0, 150.0, 12.0, 1.0, key="own_p")
+                x_g = b4.number_input("Fat (g)", 0.0, 150.0, 10.0, 1.0, key="own_x")
+                own_vp = st.checkbox("Has a vegetable / dal / curd / meat portion to eat first", True,
+                                     key="own_vp",
+                                     help="Only then does the eating-order option make sense.")
+            item = pd.Series({"name": nm or "My meal", "serving": "your entry",
+                              "carbs_g": c_g, "fiber_g": f_g, "protein_g": p_g, "fat_g": x_g,
+                              "calories_kcal": 4 * (c_g - f_g) + 4 * p_g + 9 * x_g,
+                              "has_veg_protein": int(own_vp),
+                              "net_carbs": max(c_g - f_g, 0.0)})
+            pc1.caption(f"**{item['net_carbs']:.0f} g net carbs** "
+                        f"(carbs {c_g:.0f} − fibre {f_g:.0f}) · ~{item['calories_kcal']:.0f} kcal. "
+                        "Net carbs is what drives the twin, the same rule the pipeline uses "
+                        "for real meals.")
+
         plan_walk = pc2.slider("Walk after this meal (min)", 0, 60, 0, 5, key="plan_walk")
-        pc1.caption(f"**{item['serving']}** · {item['carbs_g']:.0f} g carbs "
-                    f"({item['net_carbs']:.0f} g net) · {item['fiber_g']:.0f} g fibre · "
-                    f"{item['protein_g']:.0f} g protein · {item['fat_g']:.0f} g fat")
 
         comp = menu_to_comp(item)
         has_vp = bool(item["has_veg_protein"])
@@ -459,6 +484,31 @@ elif page == "Patient twin":
             elif not has_vp:
                 st.caption("This meal has no separate vegetable/protein portion to eat first, "
                            "so the order option is not offered for it.")
+
+            # largest portion of THIS meal that still keeps the projected peak under 140
+            ref = orders[-1] if has_vp else orders[0]
+            scale = np.arange(0.05, 2.01, 0.05)
+            safe = None
+            for s in scale:
+                tst = {k: v * s for k, v in comp.items()}
+                pk_s = float(plan_meal(meal_params, g_now, base, A_now, tst, [ref],
+                                       walk_minutes=plan_walk, walk_start_after_meal=15,
+                                       cycle_phase=cycle_phase)[ref].max())
+                if pk_s < THR:
+                    safe = s
+                else:
+                    break
+            st.markdown("**Largest safe portion**")
+            if safe is None:
+                st.markdown("Even a small portion of this meal is projected to cross 140 "
+                            "for this patient right now.")
+            elif safe >= 2.0:
+                st.markdown("Even a double portion stays below 140 for this patient right now.")
+            else:
+                st.markdown(f"About **{safe * 100:.0f}%** of this portion "
+                            f"(≈ **{item['net_carbs'] * safe:.0f} g** net carbs) is the most that "
+                            f"stays under 140, eaten *{ref.lower()}*"
+                            + (f", with the {plan_walk}-minute walk." if plan_walk else "."))
         st.warning(config.ORDER_SOURCE_NOTE)
 
     # ---------------- after the meal: actual vs predicted, and how the twin updated
