@@ -24,6 +24,7 @@ from plotly.subplots import make_subplots
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import config  # noqa: E402
+from src import meal_parser  # noqa: E402
 from src.meal_twin import load_menu, menu_to_comp, plan_meal  # noqa: E402
 from src.names import fmt_value, label  # noqa: E402
 from src.twin import activity_effect, simulate_whatif  # noqa: E402
@@ -395,9 +396,40 @@ elif page == "Patient twin":
     if MENU.empty:
         st.warning("No meal menu found (data/indian_meals.csv).")
     else:
-        mode = st.radio("Meal source", ["Pick from the menu", "Build your own"], horizontal=True,
+        modes = ["Pick from the menu", "Build your own"]
+        if meal_parser.available():
+            modes.append("Describe it in words")
+        mode = st.radio("Meal source", modes, horizontal=True,
                         help="Build your own lets you test any food, not just the ten in the menu.")
         pc1, pc2 = st.columns([2, 1])
+
+        # "Describe it in words" fills the same four numbers the manual mode takes, then falls
+        # through to it - so the twin always receives exactly the same inputs either way.
+        if mode == "Describe it in words":
+            with pc1:
+                desc = st.text_input("What did you eat?", key="desc_text",
+                                     placeholder="2 rotis, dal and a bowl of curd")
+                if st.button("Estimate nutrients", key="desc_go") and desc:
+                    with st.spinner("Estimating…"):
+                        st.session_state["desc_result"] = meal_parser.parse_meal(desc)
+            res = st.session_state.get("desc_result")
+            if res and not res.get("ok"):
+                pc1.warning(res.get("error", "Could not read that."))
+                res = None
+            if res:
+                st.session_state["own_name"] = res["name"]
+                st.session_state["own_c"] = float(res["carbs_g"])
+                st.session_state["own_f"] = float(res["fiber_g"])
+                st.session_state["own_p"] = float(res["protein_g"])
+                st.session_state["own_x"] = float(res["fat_g"])
+                st.session_state["own_vp"] = bool(res["has_veg_protein"])
+                with pc1:
+                    st.success(f"**{res['name']}** — " + " · ".join(res["items"]))
+                    st.caption(f"_{res['note']}_")
+            mode = "Build your own"   # fall through: the numbers are now editable below
+            pc1.caption("Estimated by Claude from your description — **approximate**, and editable "
+                        "below. It only fills in the four numbers; the physiology is still the "
+                        "patient's own twin.")
 
         if mode == "Pick from the menu":
             choice = pc1.selectbox("Meal", MENU["name"].tolist(),
@@ -407,14 +439,19 @@ elif page == "Patient twin":
                         f"({item['net_carbs']:.0f} g net) · {item['fiber_g']:.0f} g fibre · "
                         f"{item['protein_g']:.0f} g protein · {item['fat_g']:.0f} g fat")
         else:
+            # defaults live in session_state so "Describe it in words" can fill them in before the
+            # widgets are drawn; the widgets therefore carry no default of their own
+            for _k, _v in [("own_name", "My meal"), ("own_c", 60.0), ("own_f", 5.0),
+                           ("own_p", 12.0), ("own_x", 10.0), ("own_vp", True)]:
+                st.session_state.setdefault(_k, _v)
             with pc1:
-                nm = st.text_input("What is the meal?", "My meal", key="own_name")
+                nm = st.text_input("What is the meal?", key="own_name")
                 b1, b2, b3, b4 = st.columns(4)
-                c_g = b1.number_input("Carbs (g)", 0.0, 400.0, 60.0, 5.0, key="own_c")
-                f_g = b2.number_input("Fibre (g)", 0.0, 60.0, 5.0, 1.0, key="own_f")
-                p_g = b3.number_input("Protein (g)", 0.0, 150.0, 12.0, 1.0, key="own_p")
-                x_g = b4.number_input("Fat (g)", 0.0, 150.0, 10.0, 1.0, key="own_x")
-                own_vp = st.checkbox("Has a vegetable / dal / curd / meat portion to eat first", True,
+                c_g = b1.number_input("Carbs (g)", min_value=0.0, max_value=400.0, step=5.0, key="own_c")
+                f_g = b2.number_input("Fibre (g)", min_value=0.0, max_value=60.0, step=1.0, key="own_f")
+                p_g = b3.number_input("Protein (g)", min_value=0.0, max_value=150.0, step=1.0, key="own_p")
+                x_g = b4.number_input("Fat (g)", min_value=0.0, max_value=150.0, step=1.0, key="own_x")
+                own_vp = st.checkbox("Has a vegetable / dal / curd / meat portion to eat first",
                                      key="own_vp",
                                      help="Only then does the eating-order option make sense.")
             item = pd.Series({"name": nm or "My meal", "serving": "your entry",

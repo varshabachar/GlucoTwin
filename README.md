@@ -115,6 +115,13 @@ Run on the BIG IDEAs dataset: 16 participants, about 38,000 five-minute rows, of
 
 *AUPRC baseline (random guessing) = 0.22. "Spikes warned in advance" = share of spikes preceded by at least one alert in the 2 hours before.*
 
+> **Reproducibility note.** The table above is the original run. Re-running the identical pipeline on
+> LightGBM 4.7 / numpy 2.5 / pandas 3.0 / Python 3.14 gives **0.728** for full fusion, with every ML row
+> moving by 0.005-0.009. Gradient boosting is not bit-reproducible across library versions. The rule
+> baseline (0.612 / 0.308 / 6.8 false alarms a day), which uses no model, reproduces exactly, as does the
+> clock alignment (016 shifted +105 min, 015's meal log unused) - so this is library drift, not a data
+> difference. Conclusions are unchanged.
+
 **What the results show**
 - **Fusion helps.** Going from glucose alone to the full fusion of glucose, wearables, meals and health record raises AUROC from 0.680 to **0.733** and AUPRC from 0.407 to **0.490**. The meal log adds the most.
 - **Fewer false alarms than a basic CGM alarm.** Extrapolating the glucose trend catches almost every spike but raises **6.8 false alarms a day**, which leads to alarm fatigue. The fusion model warns of 86% of spikes with **1.9 false alarms a day**, a median of 40 minutes ahead.
@@ -316,6 +323,10 @@ streamlit run app/dashboard.py
   - **🍽 Plan a meal** (section 8): pick a common Indian meal **or build your own** (enter carbs,
     fibre, protein and fat for any food), choose an eating order, and see the projected
     peak for *carbs first* / *mixed* / *vegetables & protein first*, with whether each crosses 140
+  - **Describe it in words** *(optional)*: type "2 rotis, dal and a bowl of curd" and Claude estimates
+    carbs/fibre/protein/fat, which you can then edit. Needs an `ANTHROPIC_API_KEY`; without one the
+    option is hidden and nothing else changes. It only fills in those four numbers - the physiology is
+    still the patient's own twin, and no reported number depends on it.
   - **After the meal:** for every real meal, what the twin predicted *before* it was eaten, what the CGM
     actually recorded, and what a generic twin would have said instead
 - **Model performance:** the ablation, ROC, alert trade-off and SHAP figures, plus the per-meal learning

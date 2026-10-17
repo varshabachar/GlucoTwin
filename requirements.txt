@@ -7,3 +7,6 @@ shap>=0.44
 matplotlib>=3.8
 plotly>=5.18
 streamlit>=1.50
+# optional: only for the "Describe it in words" meal parser (src/meal_parser.py).
+# Without an ANTHROPIC_API_KEY the feature hides itself and everything else works.
+anthropic>=1.0
