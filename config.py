@@ -129,11 +129,27 @@ MENU_FILE = ROOT / "data" / "indian_meals.csv"
 # glucose peak, and n=12. The CGM studies show mean-glucose differences of only a few mg/dL. We put the
 # post-meal effect deliberately between the two and at the low end: +15% on carb sensitivity and +3 mg/dL
 # on baseline in the luteal phase. Treat as illustrative, not as a measured effect in this cohort.
-CYCLE_PHASES = ["Unknown / not logged", "Follicular (day 1-14)", "Luteal (day 15-28)"]
-CYCLE_K_MULTIPLIER = {"Unknown / not logged": 1.00, "Follicular (day 1-14)": 1.00, "Luteal (day 15-28)": 1.15}
-CYCLE_BASELINE_SHIFT = {"Unknown / not logged": 0.0, "Follicular (day 1-14)": 0.0, "Luteal (day 15-28)": 3.0}
-CYCLE_DEFAULT = "Unknown / not logged"
+#
+# !! AND READ THIS BEFORE USING IT ON THIS COHORT !!
+# The BIG IDEAs study enrolled "subjects aged 35-65 years, inclusive, INCLUDING ONLY POST-MENOPAUSAL
+# FEMALES" (https://physionet.org/content/big-ideas-glycemic-wearable/). Every one of the 9 women in
+# this dataset is post-menopausal and does not menstruate, so NO patient here has a cycle phase.
+# The control is therefore a CAPABILITY DEMONSTRATION - it shows what the twin would do for a
+# premenopausal patient - and the dashboard says so next to it. It is never a claim about a patient.
+# The dataset that would let the twin actually LEARN this is mcPHASES (PhysioNet, 42 women, ~3 months
+# each, daily LH/E3G/PdG assays and labelled cycle phases). See "Future work" in the README.
+CYCLE_NA = "Not applicable - post-menopausal cohort"
+CYCLE_PHASES = [CYCLE_NA, "Follicular (day 1-14) - demo", "Luteal (day 15-28) - demo"]
+CYCLE_K_MULTIPLIER = {CYCLE_NA: 1.00, "Follicular (day 1-14) - demo": 1.00, "Luteal (day 15-28) - demo": 1.15}
+CYCLE_BASELINE_SHIFT = {CYCLE_NA: 0.0, "Follicular (day 1-14) - demo": 0.0, "Luteal (day 15-28) - demo": 3.0}
+CYCLE_DEFAULT = CYCLE_NA
+CYCLE_COHORT_NOTE = (
+    "Every woman in this cohort is **post-menopausal** - the BIG IDEAs study enrolled only "
+    "post-menopausal females - so none of them has a menstrual cycle. The control below is a "
+    "**capability demonstration**: it shows how this twin would adjust for a premenopausal patient. "
+    "It is not a claim about this patient.")
 CYCLE_SOURCE_NOTE = (
-    "Cycle effect: based on published research, not learned from this dataset. These recordings are "
-    "7-10 days long and contain no cycle information, so the phase cannot be inferred - the doctor sets "
-    "it. With cycle logging, the twin would personalise this the way it personalises carb sensitivity.")
+    "Cycle effect: based on published research, not learned from this dataset - and it could not be. "
+    "These recordings are 7-10 days against a ~28-day cycle, no file records cycle information, and "
+    "the cohort is post-menopausal by design. mcPHASES (PhysioNet: 42 women, ~3 months each, daily "
+    "hormone assays and labelled phases) is the dataset that would let the twin learn this per patient.")

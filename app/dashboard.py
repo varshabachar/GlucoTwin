@@ -152,8 +152,17 @@ st.sidebar.caption("Proof-of-concept on open/synthetic data. Not a medical devic
 if page == "Ward overview":
     st.title("Ward overview")
     st.caption(f"Day {day}, {clock.strftime('%H:%M')} · risk of glucose ≥{THR} mg/dL within the next 2 hours")
+
+    # ---- cohort filter: this dataset is 9 post-menopausal women + 7 men
+    def sex_of(pid):
+        return "Women" if (pid in ehr.index and not int(ehr.loc[pid, "sex_male"])) else "Men"
+    n_w = sum(1 for p in PIDS if sex_of(p) == "Women")
+    cohort = st.radio("Cohort", [f"All {len(PIDS)}", f"Women {n_w}", f"Men {len(PIDS) - n_w}"],
+                      horizontal=True, help="The BIG IDEAs study enrolled only post-menopausal females.")
+    shown = [p for p in PIDS if cohort.startswith("All") or sex_of(p) == cohort.split()[0]]
+
     rows = []
-    for pid in PIDS:
+    for pid in shown:
         row, t_row, _ = now_row(pid, day, clock)
         icon, stat = status(row, pid)
         e = ehr.loc[pid] if pid in ehr.index else None
@@ -172,7 +181,7 @@ if page == "Ward overview":
         })
     ward = pd.DataFrame(rows).sort_values(["_order", "2-h spike risk"], ascending=[True, False]).drop(columns="_order")
     c1, c2, c3, c4 = st.columns(4)
-    c1.metric("Patients monitored", len(PIDS), border=True)
+    c1.metric("Patients monitored", len(shown), border=True)
     c2.metric("🔴 Alerts now", int(ward["Status"].str.contains("Alert").sum()), border=True)
     c3.metric("🟠 Watch", int(ward["Status"].str.contains("Watch").sum()), border=True)
     c4.metric("🩸 Already above 140", int(ward["Status"].str.contains("In spike").sum()), border=True)
@@ -183,6 +192,11 @@ if page == "Ward overview":
             "HbA1c %": st.column_config.NumberColumn(format="%.1f"),
         },
     )
+    if cohort.startswith("Women"):
+        st.info(f"All {n_w} women in this cohort are **post-menopausal** — the BIG IDEAs study enrolled "
+                "only post-menopausal females. A model trained on these women alone reaches "
+                "**AUROC 0.654** against **0.728** for all 16 (README section 8). That is a "
+                "cohort-size effect, not a sex difference: 9 people, one with no usable food log.")
     st.caption("Open a patient in **Patient twin** (sidebar) to see the reasons, the timeline and the what-if simulator.")
 
 
@@ -399,19 +413,21 @@ elif page == "Patient twin":
         is_female = e is not None and not int(e["sex_male"])
         cycle_phase = None
         if is_female:
-            cycle_phase = st.radio(
-                "Cycle phase (women's-health module)", config.CYCLE_PHASES,
-                index=config.CYCLE_PHASES.index(config.CYCLE_DEFAULT), horizontal=True,
-                help="Insulin sensitivity falls in the luteal phase, so the same meal tends to peak "
-                     "higher. This dataset records no cycle information, so the phase is set by hand.")
-            bump = (config.CYCLE_K_MULTIPLIER[cycle_phase] - 1) * 100
-            if bump or config.CYCLE_BASELINE_SHIFT[cycle_phase]:
-                st.caption(f"Applying **+{bump:.0f}%** to carb sensitivity and "
-                           f"**+{config.CYCLE_BASELINE_SHIFT[cycle_phase]:.0f}** mg/dL to baseline "
-                           f"for this phase.")
-            elif cycle_phase != config.CYCLE_DEFAULT:
-                st.caption("No adjustment — the follicular phase is the reference the luteal "
-                           "adjustment is measured against.")
+            with st.expander("🧬 Cycle phase (women's-health module) — capability demo", expanded=False):
+                st.warning(config.CYCLE_COHORT_NOTE)
+                cycle_phase = st.radio(
+                    "Cycle phase", config.CYCLE_PHASES,
+                    index=config.CYCLE_PHASES.index(config.CYCLE_DEFAULT), horizontal=True,
+                    help="Insulin sensitivity falls in the luteal phase, so the same meal tends to "
+                         "peak higher. Shown for a premenopausal patient; this cohort is post-menopausal.")
+                bump = (config.CYCLE_K_MULTIPLIER[cycle_phase] - 1) * 100
+                if bump or config.CYCLE_BASELINE_SHIFT[cycle_phase]:
+                    st.caption(f"Demo: applying **+{bump:.0f}%** to carb sensitivity and "
+                               f"**+{config.CYCLE_BASELINE_SHIFT[cycle_phase]:.0f}** mg/dL to baseline.")
+                elif cycle_phase != config.CYCLE_DEFAULT:
+                    st.caption("No adjustment — the follicular phase is the reference the luteal "
+                               "adjustment is measured against.")
+                st.caption(config.CYCLE_SOURCE_NOTE)
 
         psim = plan_meal(meal_params, g_now, base, A_now, comp, orders,
                          walk_minutes=plan_walk, walk_start_after_meal=15,
@@ -444,8 +460,6 @@ elif page == "Patient twin":
                 st.caption("This meal has no separate vegetable/protein portion to eat first, "
                            "so the order option is not offered for it.")
         st.warning(config.ORDER_SOURCE_NOTE)
-        if is_female:
-            st.warning(config.CYCLE_SOURCE_NOTE)
 
     # ---------------- after the meal: actual vs predicted, and how the twin updated
     if not MEAL_LOG.empty and (MEAL_LOG["pid"].astype(str) == pid).any():
@@ -532,6 +546,30 @@ elif page == "Model performance":
         if av.exists():
             st.caption("What the raw food logs actually contain (checked per patient, not assumed):")
             st.dataframe(pd.read_csv(av, dtype={"pid": str}), hide_index=True)
+
+    # ---------------- women-only cohort, side by side with all 16
+    wfile = config.ROOT / "artifacts_women" / "ablation.csv"
+    if wfile.exists():
+        st.markdown("---")
+        st.subheader("Women-only cohort (9 post-menopausal participants)")
+        st.caption("The whole pipeline re-run on the 9 female participants "
+                   "(`python run_pipeline.py --women`). Spike-ahead rate differs between the cohorts "
+                   "(15.1% vs 22.0%), so AUPRC is shown divided by each cohort's own baseline.")
+        aw = pd.read_csv(wfile)
+        a16 = pd.DataFrame(metrics["ablation"])
+        side = pd.DataFrame({
+            "Data used": a16["model"],
+            "AUROC — all 16": a16["auroc"].round(3),
+            "AUROC — 9 women": aw["auroc"].round(3),
+            "AUPRC ÷ baseline — all 16": (a16["auprc"] / a16["prevalence"]).round(2),
+            "AUPRC ÷ baseline — 9 women": (aw["auprc"] / aw["prevalence"]).round(2),
+        })
+        st.dataframe(side, hide_index=True)
+        st.warning("On the women-only cohort the best model is **+ Meal log (0.667)** and adding the "
+                   "EHR makes it **worse** (0.654) — the 'every stream helps' result from the main "
+                   "table does not replicate. With 9 subjects, leave-one-subject-out trains on 8 "
+                   "people and one of them has no usable food log. This is a **cohort-size effect, "
+                   "not a finding about women**, and we do not claim otherwise.")
 
 
 # ================================================================== DATA & COMPLIANCE

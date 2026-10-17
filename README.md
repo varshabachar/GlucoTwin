@@ -221,17 +221,21 @@ Insulin sensitivity falls in the **luteal** phase, so the same meal tends to pea
 half of the cycle. For a tool aimed at prediabetes in India — where the people being screened are very
 often women — that is a real clinical factor, and it is missing from most glucose models.
 
-**It cannot be learned from this dataset, and we do not pretend otherwise.** Two hard facts:
+**It cannot be learned from this dataset, and — importantly — it does not even apply to this cohort.**
+Three hard facts:
 
 | | |
 |---|---|
+| **Study inclusion criterion** | *"subjects aged 35-65 years, inclusive, **including only post-menopausal females**"* ([PhysioNet](https://physionet.org/content/big-ideas-glycemic-wearable/)) |
 | A menstrual cycle | ~28 days |
 | Longest recording in this dataset | **9.9 days** (the 9 women: 7.7 – 9.9 days) |
 | Cycle / hormone / menstrual columns in the 65 raw files | **none** |
 
-You cannot observe a cycle in eight days, let alone compare phases within one person. So this follows
-exactly the same pattern as the eating-order effect: **one labelled constant the doctor sets by hand**,
-in `config.CYCLE_K_MULTIPLIER`, shown only for female patients, and never used in any accuracy number.
+**All 9 women in this dataset are post-menopausal and do not menstruate.** So the cycle control is not
+a claim about any patient here — it is a **capability demonstration**, shown behind an expander that
+says exactly that, demonstrating how the twin would adjust for a premenopausal patient. Like the
+eating-order effect it is **one labelled constant the doctor sets by hand** (`config.CYCLE_K_MULTIPLIER`),
+and it is never used in any accuracy number.
 
 - Luteal phase: carb sensitivity **×1.15**, baseline **+3 mg/dL**. Follicular is the reference.
 - Chosen conservatively. The insulin-sensitivity drop reported in the literature is much larger
@@ -251,9 +255,15 @@ In the dashboard, for patient P-005 eating rice + dal + sabzi:
 | Follicular (reference) | 146 🔴 | 142 🔴 | **135** 🟢 |
 | Luteal | 153 🔴 | 148 🔴 | **141** 🔴 |
 
-The teaching point: in the follicular phase, eating the vegetables first keeps her under 140. **In the
-luteal phase the same strategy is no longer enough.** Same woman, same meal, same advice — different
-answer depending on where she is in her cycle.
+The teaching point, for a premenopausal patient: in the follicular phase, eating the vegetables first
+keeps her under 140. **In the luteal phase the same strategy is no longer enough.** Same woman, same
+meal, same advice — different answer depending on where she is in her cycle.
+
+**The dataset that would let the twin actually learn this** is
+[mcPHASES](https://www.physionet.org/content/mcphases/1.0.0/) (PhysioNet, restricted access): 42 women,
+**~3 months each** — long enough for three full cycles — with a Dexcom G6, a Fitbit Sense, and **daily
+LH, E3G and PdG urine assays with labelled cycle phases**. With that, `fb`/`fd`-style per-person cycle
+parameters could be fitted the way carb sensitivity is today, instead of assumed. See *Future work*.
 
 ### A women-only cohort: what actually happens with 9 participants
 
@@ -392,11 +402,10 @@ python run_pipeline.py --women
   11 adults with type 2 diabetes (section 8), applied conservatively. It is an illustration of what the
   twin *could* personalise if order were logged, not a finding from this cohort.
 - **The Indian meal menu is approximate.** It was not verified against IFCT 2017 dish by dish.
-- **The menstrual-cycle effect is not learned here either, and could not be.** The recordings are
-  7-10 days and a cycle is ~28 days, and no file in the dataset records cycle, hormone or menstrual
-  information. The phase is set by the doctor and the adjustment is a published constant (section 8).
-  We also do not know which participants are premenopausal: the dataset has no age, and the ages in
-  this project are synthetic.
+- **The cohort is post-menopausal, so the cycle module does not apply to it.** The BIG IDEAs study
+  enrolled only post-menopausal females, the recordings are 7-10 days against a ~28-day cycle, and no
+  file records cycle or hormone data. The control is a labelled capability demonstration, not a claim
+  about any patient here, and it never enters an accuracy number (section 8).
 - **The women-only cohort is too small to conclude anything about sex differences.** Nine participants,
   one of whom has no usable meal log. Its weaker numbers reflect cohort size, not a finding about women.
 - **Food composition did not measurably help.** Adding fibre and fat/protein terms changed the per-meal
@@ -405,6 +414,12 @@ python run_pipeline.py --women
 - **Clinical deployment.** That would need prospective validation, regulatory review, and integration with ABDM-compliant consent flows.
 
 ## 13. Future work
+- **A cycle-aware twin learned from data, not assumed.** [mcPHASES](https://www.physionet.org/content/mcphases/1.0.0/)
+  (PhysioNet, restricted access) follows 42 women for ~3 months each with a Dexcom G6, a Fitbit Sense
+  and daily LH/E3G/PdG assays with labelled cycle phases. Three months is three full cycles per woman,
+  so the luteal adjustment that is a fixed constant here could be fitted **per patient**, exactly as
+  carb sensitivity is today. That is the right dataset for the women's-health module; this one is
+  post-menopausal by design and 8 days long.
 - Real EHRs through ABDM/FHIR consent flows.
 - Federated or on-device training, so data stays on the patient's phone.
 - Multi-day forecasting and hypoglycaemia alerts.

@@ -133,19 +133,24 @@ the meal crossing 140. That is the whole argument for having a twin as well as a
 >
 > Then it learned from that one too."
 
-> **[Set Cycle phase to "Luteal (day 15-28)". The three peaks move to 153 / 148 / 141]**
+> **[Open the "🧬 Cycle phase — capability demo" expander. Set it to "Luteal — demo".
+> The three peaks move to 153 / 148 / 141]**
 >
-> "One more, and this one matters for who we're building for. P-005 is a woman, so the twin offers a
-> cycle phase. Insulin sensitivity drops in the luteal phase — the second half of the cycle — so the
-> same meal peaks higher.
+> "One more, and I want to be careful with this one. Insulin sensitivity drops in the luteal phase, so
+> the same meal peaks higher — and that matters for a tool aimed at prediabetes in India, where most of
+> the people being screened are women.
 >
-> Watch the vegetables-first number. In the follicular phase it was **135**: she stays under the line.
-> In the luteal phase it's **141**. *The same advice no longer works.* Same woman, same meal — it
-> depends where she is in her cycle.
+> **But read the warning first.** This study enrolled *only post-menopausal women*. Every woman in this
+> dataset is post-menopausal. None of them has a cycle. So this control is not telling you anything
+> about patient five — it's a capability demonstration, showing what the twin would do for a
+> premenopausal patient.
 >
-> And the same honesty applies as before: this is a published effect the doctor sets, not something
-> learned here. These recordings are eight days long and a cycle is twenty-eight. You cannot learn a
-> cycle from eight days, so we don't claim to."
+> And with that caveat, look at the vegetables-first number. Follicular: **135**, she stays under the
+> line. Luteal: **141**. *The same advice stops working.*
+>
+> To actually learn this rather than assume it you need mcPHASES — forty-two women, three months each,
+> daily hormone assays. That's in my future work, and it's the honest answer to 'why didn't you just
+> train it?'"
 >
 > **[Optional closing beat, 10 seconds — only if you have room]**
 >
@@ -219,12 +224,17 @@ twin's own accuracy. They're reported separately on purpose.
 **Q5. "You've added a menstrual-cycle feature. Did you validate it on this data? And why not build the
 whole thing for women?"**
 
-No, and I couldn't have. The dataset has no cycle, hormone or menstrual field in any of its 65 files,
-and each person is recorded for seven to ten days while a cycle is about twenty-eight. You cannot
-observe a cycle in eight days, let alone compare phases within one person — so the phase is set by the
-doctor and the adjustment is a published constant, flagged on screen exactly like the eating-order one.
-I also can't tell you which participants are premenopausal, because the dataset has no age at all; the
-ages in this project are synthetic.
+No — and it's worse than that, which is why the control says so on screen. **This study enrolled only
+post-menopausal females.** That's the stated inclusion criterion on PhysioNet. So every woman in the
+dataset is post-menopausal and none of them has a cycle at all; the feature could not apply to a single
+patient here even in principle. On top of that there's no cycle or hormone field in any of the 65 files,
+and the recordings are seven to ten days against a twenty-eight-day cycle.
+
+So I kept it as an explicitly labelled capability demonstration rather than deleting it, because the
+clinical point is real and the gap is real — most glucose models ignore it. The dataset that would let
+me actually learn it is mcPHASES on PhysioNet: forty-two women, three months each, daily LH, E3G and
+PdG assays with labelled phases. Three months is three cycles per woman, enough to fit a per-patient
+luteal parameter the way I fit carb sensitivity today. That's in my future work.
 
 On building it women-only — I did run it, and it's in the README. Nine women, and the full-fusion AUROC
 falls from 0.728 to 0.654, with the EHR actually making things *worse* rather than better. That's a
