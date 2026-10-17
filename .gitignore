@@ -15,3 +15,10 @@ Thumbs.db
 # personal notes and archives
 GETTING_STARTED.md
 *.zip
+
+# women-only side experiment (section 8): keep the small result files that back the README
+# numbers, not the heavy model/dataset dumps - the dashboard does not read this folder
+artifacts_women/models/
+artifacts_women/dataset.pkl.gz
+artifacts_women/meals.pkl
+artifacts_women/ehr/

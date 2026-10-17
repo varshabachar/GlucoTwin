@@ -57,13 +57,15 @@ grid = box(4.3, 3.6, 3.4, 3.5, "Streaming fusion grid",
            "CSVs -> 5-minute bins\nclock alignment: wristband & meal log\nchecked against the CGM\nonly data up to 'now' is used\n\nfeatures: glucose dynamics, HRV,\nactivity, sleep, meal load\n\nlabel: glucose crosses 140 mg/dL\nwithin the next 2 hours", "process")
 fhir = box(4.3, 1.0, 3.4, 1.35, "FHIR ingestion", "LOINC / SNOMED / RxNorm\n-> static feature vector (17)", "process")
 
-twin = box(8.2, 5.25, 3.4, 1.85, "Digital twin (per patient)",
-           "meal response + activity + recovery\nparameters k, tp, a, tr\nre-calibrated daily on own data\n-> 2-h glucose forecast", "brain")
+twin = box(8.2, 5.15, 3.4, 1.95, "Digital twin (per patient)",
+           "meal response + activity + recovery\nparameters k, tp, a, tr\nre-calibrated daily on own data\n"
+           "learns MEAL BY MEAL: predict the peak,\ncompare with the CGM, re-fit (fb, fd)\n-> 2-h glucose forecast", "brain")
 model = box(8.2, 2.95, 3.4, 1.95, "Fusion model",
             "LightGBM · ~60 features\nCGM + wearable + meals + EHR + twin\nleave-one-subject-out validated\nthreshold set by inner CV", "brain")
 shap = box(8.2, 1.0, 3.4, 1.55, "Explainability", "TreeSHAP per alert\nplain-language reasons", "brain")
 
-whatif = box(12.1, 5.55, 3.3, 1.55, "What-if simulator", "meal size x post-meal walk\n-> projected peak", "out")
+whatif = box(12.1, 5.40, 3.3, 1.70, "What-if / plan a meal",
+             "meal size x post-meal walk\nIndian meal menu (approximate)\neating order (published research,\nnot learned here)\n-> projected peak", "out")
 risk = box(12.1, 3.95, 3.3, 1.3, "Early warning", "2-hour spike risk + alert\npatient-specific threshold", "out")
 why = box(12.1, 2.35, 3.3, 1.3, "Why", "top reasons, e.g. 'large lunch,\nshort sleep, low activity'", "out")
 dash = box(12.1, 0.55, 3.3, 1.5, "Doctor dashboard",

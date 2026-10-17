@@ -24,6 +24,7 @@ from plotly.subplots import make_subplots
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import config  # noqa: E402
+from src.meal_twin import load_menu, menu_to_comp, plan_meal  # noqa: E402
 from src.names import fmt_value, label  # noqa: E402
 from src.twin import activity_effect, simulate_whatif  # noqa: E402
 
@@ -48,6 +49,18 @@ def load():
     return data, meals, ehr, twin, feats, metrics, thr
 
 
+@st.cache_data(show_spinner=False)
+def load_meal_twin():
+    """Per-meal learning artifacts. All optional: without them the rest of the page still works."""
+    log = pd.read_csv(A / "meal_learning.csv", parse_dates=["time"]) if (A / "meal_learning.csv").exists() \
+        else pd.DataFrame()
+    summary = pd.read_csv(A / "meal_learning_summary.csv") if (A / "meal_learning_summary.csv").exists() \
+        else pd.DataFrame()
+    params = json.loads((A / "meal_twin_params.json").read_text()) \
+        if (A / "meal_twin_params.json").exists() else {}
+    return log, summary, params
+
+
 @st.cache_resource
 def booster(pid: str):
     f = A / "models" / f"fold_{pid}.txt"
@@ -59,6 +72,8 @@ if not (A / "dataset.pkl.gz").exists():
     st.stop()
 
 data, meals, ehr, twin, FEATS, metrics, PT_THR = load()
+MEAL_LOG, MEAL_SUMMARY, MEAL_PARAMS = load_meal_twin()
+MENU = load_menu()
 PIDS = sorted(data["pid"].unique())
 patients = {pid: data[data["pid"] == pid] for pid in PIDS}
 max_days = int(max(d["rel_day"].max() for d in patients.values())) + 1
@@ -347,6 +362,124 @@ elif page == "Patient twin":
             st.info(f"A {walk}-minute {pace} walk lowers this patient's projected peak by **{drop:.0f} mg/dL**.")
         st.caption("Simulation from the patient's calibrated twin. Illustrative decision support, not a prescription.")
 
+    # ---------------- NEW: plan a meal (food, order) + what the twin learned from real meals
+    st.markdown("---")
+    st.header("🍽 Plan a meal")
+    mp = MEAL_PARAMS.get(pid, {})
+    meal_params = {**config.TWIN_PRIOR, **config.TWIN_COMP_PRIOR, **{k: v for k, v in mp.items()
+                   if k in ("k", "tp", "a", "tr", "fb", "fd")}}
+    n_meals_learned = int(mp.get("meals_used", 0))
+    if not mp.get("personalised"):
+        st.info("This patient's twin is still on population averages for meals "
+                f"({n_meals_learned} usable meals in their log), so the numbers below are generic.")
+    else:
+        st.caption(f"Using this patient's meal-learned twin: carb sensitivity **{meal_params['k']:.2f}** "
+                   f"mg/dL per g, time-to-peak **{meal_params['tp']:.0f}** min, fibre blunting "
+                   f"**{meal_params['fb']:.2f}**, fat/protein delay **{meal_params['fd']:.2f}** "
+                   f"— learned from **{n_meals_learned}** of their own meals.")
+
+    if MENU.empty:
+        st.warning("No meal menu found (data/indian_meals.csv).")
+    else:
+        pc1, pc2 = st.columns([2, 1])
+        choice = pc1.selectbox("Meal", MENU["name"].tolist(),
+                               help="Approximate values — see the header of data/indian_meals.csv")
+        item = MENU[MENU["name"] == choice].iloc[0]
+        plan_walk = pc2.slider("Walk after this meal (min)", 0, 60, 0, 5, key="plan_walk")
+        pc1.caption(f"**{item['serving']}** · {item['carbs_g']:.0f} g carbs "
+                    f"({item['net_carbs']:.0f} g net) · {item['fiber_g']:.0f} g fibre · "
+                    f"{item['protein_g']:.0f} g protein · {item['fat_g']:.0f} g fat")
+
+        comp = menu_to_comp(item)
+        has_vp = bool(item["has_veg_protein"])
+        orders = [o for o in config.ORDER_PEAK_MULTIPLIER
+                  if has_vp or o != "Vegetables & protein first"]
+
+        # ---- women's-health module: menstrual cycle phase (doctor-set, never inferred)
+        is_female = e is not None and not int(e["sex_male"])
+        cycle_phase = None
+        if is_female:
+            cycle_phase = st.radio(
+                "Cycle phase (women's-health module)", config.CYCLE_PHASES,
+                index=config.CYCLE_PHASES.index(config.CYCLE_DEFAULT), horizontal=True,
+                help="Insulin sensitivity falls in the luteal phase, so the same meal tends to peak "
+                     "higher. This dataset records no cycle information, so the phase is set by hand.")
+            bump = (config.CYCLE_K_MULTIPLIER[cycle_phase] - 1) * 100
+            if bump or config.CYCLE_BASELINE_SHIFT[cycle_phase]:
+                st.caption(f"Applying **+{bump:.0f}%** to carb sensitivity and "
+                           f"**+{config.CYCLE_BASELINE_SHIFT[cycle_phase]:.0f}** mg/dL to baseline "
+                           f"for this phase.")
+            elif cycle_phase != config.CYCLE_DEFAULT:
+                st.caption("No adjustment — the follicular phase is the reference the luteal "
+                           "adjustment is measured against.")
+
+        psim = plan_meal(meal_params, g_now, base, A_now, comp, orders,
+                         walk_minutes=plan_walk, walk_start_after_meal=15,
+                         cycle_phase=cycle_phase)
+
+        f3 = go.Figure()
+        for order, colr in zip(orders, [ORANGE, MUTED, BLUE]):
+            f3.add_trace(go.Scatter(x=psim["minute"], y=psim[order], name=order,
+                                    line=dict(color=colr, width=2.5)))
+        f3.add_hline(y=THR, line=dict(color=CRITICAL, dash="dash", width=1),
+                     annotation_text=f"{THR} mg/dL")
+        f3.update_layout(height=360, xaxis_title="Minutes after the first bite",
+                         yaxis_title="Projected glucose (mg/dL)",
+                         margin=dict(l=10, r=10, t=30, b=10), legend=dict(orientation="h", y=1.12))
+        q1, q2 = st.columns([2.2, 1])
+        with q1:
+            st.plotly_chart(f3)
+        with q2:
+            st.markdown("**Projected peak**")
+            for order in orders:
+                pk = float(psim[order].max())
+                when = float(psim.loc[psim[order].idxmax(), "minute"])
+                mark = "🔴 crosses 140" if pk >= THR else "🟢 stays below 140"
+                st.markdown(f"{order}: **{pk:.0f}** mg/dL at +{when:.0f} min · {mark}")
+            if has_vp and "Carbs first" in psim and "Vegetables & protein first" in psim:
+                saved = float(psim["Carbs first"].max()) - float(psim["Vegetables & protein first"].max())
+                st.success(f"Eating the vegetables and protein first lowers the projected peak by "
+                           f"**{saved:.0f}** mg/dL.")
+            elif not has_vp:
+                st.caption("This meal has no separate vegetable/protein portion to eat first, "
+                           "so the order option is not offered for it.")
+        st.warning(config.ORDER_SOURCE_NOTE)
+        if is_female:
+            st.warning(config.CYCLE_SOURCE_NOTE)
+
+    # ---------------- after the meal: actual vs predicted, and how the twin updated
+    if not MEAL_LOG.empty and (MEAL_LOG["pid"].astype(str) == pid).any():
+        ml = MEAL_LOG[MEAL_LOG["pid"].astype(str) == pid].sort_values("meal_number")
+        st.subheader("After the meal: what really happened, and what the twin learned")
+        st.caption("Each meal below was predicted **before it was eaten**, using only this patient's "
+                   "earlier meals. Then the CGM recorded the real peak and the twin re-fitted.")
+        pick = st.select_slider(
+            "Meal number", options=ml["meal_number"].tolist(),
+            value=int(ml["meal_number"].iloc[-1]),
+            format_func=lambda n: f"#{n}", key="meal_pick")
+        r = ml[ml["meal_number"] == pick].iloc[0]
+        m1, m2, m3, m4 = st.columns(4)
+        m1.metric("Predicted peak", f"{r['pred_peak_comp']:.0f} mg/dL",
+                  help="From the twin as it stood BEFORE this meal")
+        m2.metric("Actual CGM peak", f"{r['actual_peak']:.0f} mg/dL",
+                  f"{r['actual_peak'] - r['pred_peak_comp']:+.0f} vs predicted", delta_color="off")
+        m3.metric("Generic twin would have said", f"{r['pred_peak_prior']:.0f} mg/dL",
+                  f"{abs(r['pred_peak_prior'] - r['actual_peak']) - abs(r['pred_peak_comp'] - r['actual_peak']):+.0f} mg/dL worse",
+                  delta_color="inverse")
+        m4.metric("Meals learned from by then", f"{int(r['n_history_meals'])}")
+        st.caption(f"Meal logged {r['time']:%a %d %b %H:%M} · {r['net_carbs']:.0f} g net carbs · "
+                   f"{r['fiber']:.0f} g fibre · {r['protein']:.0f} g protein · {r['fat']:.0f} g fat · "
+                   f"twin at that moment: k={r['k']:.2f}, time-to-peak={r['tp']:.0f} min")
+        f4 = go.Figure()
+        f4.add_trace(go.Scatter(x=ml["meal_number"], y=ml["err_prior"], name="Generic population twin",
+                                line=dict(color=ORANGE, width=1.8)))
+        f4.add_trace(go.Scatter(x=ml["meal_number"], y=ml["err_comp"], name="This patient's learning twin",
+                                line=dict(color=BLUE, width=2.5)))
+        f4.add_vline(x=pick, line=dict(color=MUTED, width=1.5, dash="dot"))
+        f4.update_layout(height=260, xaxis_title="Meal number", yaxis_title="Error in predicted peak (mg/dL)",
+                         margin=dict(l=10, r=10, t=30, b=10), legend=dict(orientation="h", y=1.2))
+        st.plotly_chart(f4)
+
 
 # ================================================================== MODEL PERFORMANCE
 elif page == "Model performance":
@@ -378,6 +511,28 @@ elif page == "Model performance":
     st.subheader("Alert threshold trade-off")
     st.dataframe(pd.DataFrame(metrics["thresholds"]).round(3), hide_index=True)
 
+    # ---------------- NEW: the per-meal learning twin, reported separately
+    if not MEAL_SUMMARY.empty:
+        st.markdown("---")
+        st.subheader("Per-meal learning twin (separate from the table above)")
+        st.caption("How close the twin's predicted post-meal peak was to the real CGM peak. "
+                   "Every meal was predicted from parameters fitted on that patient's earlier "
+                   "meals only. This measures the twin, not the LightGBM alarm above.")
+        st.dataframe(MEAL_SUMMARY.rename(columns={
+            "variant": "Twin", "mae_all": "Mean error (mg/dL)", "mae_late": "Later half of meals",
+            "median_all": "Median error", "meals": "Meals scored",
+            "improvement_vs_population": "Improvement vs population"}).round(3),
+            hide_index=True,
+            column_config={"Improvement vs population": st.column_config.NumberColumn(format="percent")})
+        if (config.FIGURES_DIR / "meal_learning.png").exists():
+            st.image(str(config.FIGURES_DIR / "meal_learning.png"),
+                     caption="Left: error against how many of that person's meals the twin had seen. "
+                             "Right: the three twin variants compared.")
+        av = A / "meal_composition_available.csv"
+        if av.exists():
+            st.caption("What the raw food logs actually contain (checked per patient, not assumed):")
+            st.dataframe(pd.read_csv(av, dtype={"pid": str}), hide_index=True)
+
 
 # ================================================================== DATA & COMPLIANCE
 else:
@@ -392,6 +547,9 @@ else:
 | Food log | same | Real, de-identified |
 | Sex, HbA1c | same (Demographics.csv) | Real, de-identified |
 | Age, labs, diagnoses, medications, family history, genetic markers | Generated by `src/ehr.py` as FHIR R4 | **Synthetic** |
+| Eating-order effect in "Plan a meal" | Shukla et al., *Diabetes Care* 2015;38(7):e98-e99 | **Published research, not learned here** |
+| Menstrual cycle phase effect | Valdes & Elkind-Hirsch 1991; CGM studies across 149 and 1,982 cycles | **Published research, doctor-set.** Recordings are 7-10 days vs a ~28-day cycle, and no file records cycle data, so it cannot be inferred |
+| Indian meal menu (`data/indian_meals.csv`) | Typical servings, approximate | **Approximate, not an IFCT 2017 lookup** |
 
 Data source in this build: `{metrics.get('data_source', '')}` · {len(PIDS)} participants · {metrics.get('rows', 0):,} five-minute rows.
 """)

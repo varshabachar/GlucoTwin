@@ -180,3 +180,77 @@ def make_all(result: dict, curve: pd.DataFrame, meals: dict, features: list[str]
     threshold_chart(result["thresholds"])
     shap_charts(result["final_model"], data, features)
     example_patient_chart(data, meals, result.get("patient_thresholds", {}))
+
+
+# ------------------------------------------------------------------ NEW: per-meal learning twin
+def meal_learning_chart(log: pd.DataFrame, compare: pd.DataFrame):
+    """Does the twin predict a meal better once it has seen more of that person's meals?
+
+    Left: peak error against meals already seen - one thin line per patient, thick lines averaged.
+    Right: mean error of the three twin variants over all scored meals.
+    Reported separately from the LightGBM results: this is the twin's own accuracy, not the model's.
+    """
+    if log is None or log.empty:
+        return
+    fig, (ax, ax2) = plt.subplots(1, 2, figsize=(12, 4.4), gridspec_kw={"width_ratios": [1.55, 1]})
+
+    for _, d in log.groupby("pid"):
+        d = d.sort_values("n_history_meals")
+        ax.plot(d["n_history_meals"], d["err_comp"].rolling(5, min_periods=2).mean(),
+                color=BLUE, lw=0.8, alpha=0.30)
+    bin_size, min_patients = 5, 5
+    g = log.copy()
+    g["seen"] = (g["n_history_meals"] // bin_size) * bin_size
+    agg = g.groupby("seen").agg(err_prior=("err_prior", "mean"), err_carbs=("err_carbs", "mean"),
+                                err_comp=("err_comp", "mean"), patients=("pid", "nunique"))
+    # Only a handful of people logged more than ~30 meals, so the far right of this curve would be
+    # one or two patients' noise. Bins carrying fewer than `min_patients` people are not averaged.
+    full = agg[agg["patients"] >= min_patients]
+    ax.plot(full.index, full["err_prior"], color=ORANGE, marker="o", ms=5,
+            label="Generic population twin")
+    ax.plot(full.index, full["err_carbs"], color=MUTED, ls="--", marker="o", ms=4,
+            label="Learns each meal (carbs only)")
+    ax.plot(full.index, full["err_comp"], color=BLUE, marker="o", ms=5,
+            label="Learns each meal + composition")
+    if len(full) and len(full) < len(agg):
+        ax.axvline(full.index.max() + bin_size / 2, color=AXIS, lw=1, ls=":")
+        ax.text(full.index.max() + bin_size * 0.7, ax.get_ylim()[1] * 0.96,
+                f"fewer than {min_patients}\npatients beyond here",
+                fontsize=8, color=MUTED, va="top")
+    ax.set_xlabel("Meals of this patient the twin had already seen")
+    ax.set_ylabel("Error in predicted peak (mg/dL)")
+    ax.set_title("The twin learns meal by meal", loc="left")
+    ax.set_ylim(bottom=0)
+    ax.legend(fontsize=8.5)
+    ax.xaxis.set_major_locator(matplotlib.ticker.MaxNLocator(integer=True))
+
+    names = ["Population\ntwin", "Per-meal\n(carbs only)", "Per-meal\n+ composition"]
+    vals = compare["mae_all"].to_numpy() if compare is not None and len(compare) else np.array([])
+    if len(vals) == 3:
+        ax2.bar(names, vals, color=[ORANGE, MUTED, BLUE], width=0.6)
+        for i, v in enumerate(vals):
+            ax2.text(i, v + 0.3, f"{v:.1f}", ha="center", color=INK2, fontsize=9.5)
+        ax2.set_ylabel("Mean error in predicted peak (mg/dL)")
+        ax2.set_title(f"Averaged over {int(compare['meals'].iloc[0])} real meals", loc="left")
+        ax2.grid(axis="x", visible=False)
+        ax2.set_ylim(0, max(vals) * 1.22)
+    _save(fig, "meal_learning.png")
+
+
+def meal_order_chart(sim: pd.DataFrame, meal_name: str, orders: list[str], threshold: float = None):
+    """The same meal under each eating order, for the slides. Literature-based, not learned."""
+    threshold = config.SPIKE_THRESHOLD if threshold is None else threshold
+    fig, ax = plt.subplots(figsize=(6.6, 4.2))
+    for order, c in zip(orders, [ORANGE, MUTED, BLUE]):
+        if order in sim:
+            ax.plot(sim["minute"], sim[order], color=c, lw=2.2,
+                    label=f"{order}  (peak {sim[order].max():.0f})")
+    ax.axhline(threshold, color=CRITICAL, lw=1.2, ls="--")
+    ax.text(0, threshold + 2, f"{threshold:.0f} mg/dL spike line", color=CRITICAL, fontsize=8.5)
+    ax.set_xlabel("Minutes after the first bite")
+    ax.set_ylabel("Projected glucose (mg/dL)")
+    ax.set_title(f"{meal_name}: same food, different order", loc="left")
+    ax.legend(fontsize=8.5)
+    fig.text(0.0, -0.06, "Order effect from published research (Shukla et al., Diabetes Care 2015), "
+             "not learned from this dataset.", fontsize=8, color=MUTED)
+    _save(fig, "meal_order.png")

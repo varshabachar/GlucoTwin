@@ -1,0 +1,168 @@
+{
+  "data_source": "C:\\Users\\AMOG\\Desktop\\collage\\sem 5\\glucotwin\\GlucoTwin_final\\GlucoTwin\\data\\raw",
+  "participants": [
+    "001",
+    "002",
+    "003",
+    "004",
+    "005",
+    "006",
+    "007",
+    "008",
+    "009",
+    "010",
+    "011",
+    "012",
+    "013",
+    "014",
+    "015",
+    "016"
+  ],
+  "rows": 38115,
+  "labelled_rows": 31945,
+  "spike_threshold_mg_dl": 140,
+  "horizon_min": 120,
+  "alert_threshold": 0.5,
+  "ablation": [
+    {
+      "model": "Rule: trend extrapolation",
+      "auroc": 0.6121721562516815,
+      "auprc": 0.30783373761450683,
+      "auroc_subject_mean": 0.5721865825990367,
+      "auroc_subject_sd": 0.030356024756532065,
+      "sensitivity": 0.9910179640718563,
+      "median_lead_min": 75.0,
+      "false_alarms_per_day": 6.827009964721172,
+      "alert_precision": 0.35084745762711866,
+      "prevalence": 0.2199225025989982
+    },
+    {
+      "model": "CGM only",
+      "auroc": 0.6807481569008679,
+      "auprc": 0.4071743666574257,
+      "auroc_subject_mean": 0.632144764510578,
+      "auroc_subject_sd": 0.09304606260127835,
+      "sensitivity": 0.9131736526946108,
+      "median_lead_min": 10.0,
+      "false_alarms_per_day": 1.7360068889162257,
+      "alert_precision": 0.6294896030245747,
+      "prevalence": 0.21981530755986853
+    },
+    {
+      "model": "+ Wearables",
+      "auroc": 0.666502428733704,
+      "auprc": 0.3747977400429157,
+      "auroc_subject_mean": 0.6402944228031356,
+      "auroc_subject_sd": 0.08239238605547365,
+      "sensitivity": 0.8832335329341318,
+      "median_lead_min": 15.0,
+      "false_alarms_per_day": 2.3471521712387746,
+      "alert_precision": 0.5470085470085471,
+      "prevalence": 0.21981530755986853
+    },
+    {
+      "model": "+ Meal log",
+      "auroc": 0.7083859529161267,
+      "auprc": 0.4685770223827526,
+      "auroc_subject_mean": 0.6841400853474675,
+      "auroc_subject_sd": 0.09909656279012437,
+      "sensitivity": 0.8802395209580839,
+      "median_lead_min": 45.0,
+      "false_alarms_per_day": 2.311723459220076,
+      "alert_precision": 0.5388692579505301,
+      "prevalence": 0.21981530755986853
+    },
+    {
+      "model": "+ EHR (full fusion)",
+      "auroc": 0.7284615453534797,
+      "auprc": 0.47763048359365035,
+      "auroc_subject_mean": 0.6879282955901438,
+      "auroc_subject_sd": 0.09620683238988076,
+      "sensitivity": 0.8592814371257484,
+      "median_lead_min": 45.0,
+      "false_alarms_per_day": 1.9751506950424405,
+      "alert_precision": 0.5760456273764258,
+      "prevalence": 0.21981530755986853
+    },
+    {
+      "model": "+ Digital twin",
+      "auroc": 0.7249021317757811,
+      "auprc": 0.4730350315759142,
+      "auroc_subject_mean": 0.6822578436270295,
+      "auroc_subject_sd": 0.10738597602808857,
+      "sensitivity": 0.8922155688622755,
+      "median_lead_min": 45.0,
+      "false_alarms_per_day": 2.1522942551359328,
+      "alert_precision": 0.558983666061706,
+      "prevalence": 0.21981530755986853
+    }
+  ],
+  "thresholds": [
+    {
+      "threshold": 0.1,
+      "spikes": 334,
+      "spikes_warned": 334,
+      "sensitivity": 1.0,
+      "median_lead_min": 120.0,
+      "alerts": 548,
+      "alert_precision": 0.2281021897810219,
+      "false_alarms_per_day": 3.7465862959773646,
+      "days_monitored": 112.90277777777779
+    },
+    {
+      "threshold": 0.2,
+      "spikes": 334,
+      "spikes_warned": 333,
+      "sensitivity": 0.9970059880239521,
+      "median_lead_min": 120.0,
+      "alerts": 753,
+      "alert_precision": 0.28286852589641437,
+      "false_alarms_per_day": 4.7828761225242955,
+      "days_monitored": 112.90277777777779
+    },
+    {
+      "threshold": 0.3,
+      "spikes": 334,
+      "spikes_warned": 329,
+      "sensitivity": 0.9850299401197605,
+      "median_lead_min": 95.0,
+      "alerts": 756,
+      "alert_precision": 0.376984126984127,
+      "false_alarms_per_day": 4.171730840201747,
+      "days_monitored": 112.90277777777779
+    },
+    {
+      "threshold": 0.4,
+      "spikes": 334,
+      "spikes_warned": 319,
+      "sensitivity": 0.9550898203592815,
+      "median_lead_min": 60.0,
+      "alerts": 668,
+      "alert_precision": 0.4625748502994012,
+      "false_alarms_per_day": 3.1797269036781888,
+      "days_monitored": 112.90277777777779
+    },
+    {
+      "threshold": 0.5,
+      "spikes": 334,
+      "spikes_warned": 298,
+      "sensitivity": 0.8922155688622755,
+      "median_lead_min": 45.0,
+      "alerts": 551,
+      "alert_precision": 0.558983666061706,
+      "false_alarms_per_day": 2.1522942551359328,
+      "days_monitored": 112.90277777777779
+    },
+    {
+      "threshold": 0.6,
+      "spikes": 334,
+      "spikes_warned": 265,
+      "sensitivity": 0.7934131736526946,
+      "median_lead_min": 35.0,
+      "alerts": 418,
+      "alert_precision": 0.6650717703349283,
+      "false_alarms_per_day": 1.240004920654447,
+      "days_monitored": 112.90277777777779
+    }
+  ]
+}

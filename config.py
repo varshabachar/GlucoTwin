@@ -71,3 +71,69 @@ LGBM_PARAMS = dict(
     random_state=RANDOM_SEED,
     verbose=-1,
 )
+
+# ================================================================= NEW: per-meal learning twin
+# Everything below is an ADDITION reported separately from the locked fusion-model results.
+# It does not touch the LightGBM model, its features, or the leave-one-subject-out evaluation.
+
+# ---------------------------------------------------------------- per-meal learning (src/meal_twin.py)
+MEAL_MIN_CARBS = 15.0        # g net carbs: below this a "meal" is a snack and its response is in the noise
+MEAL_PEAK_WINDOW_MIN = 180   # look for the post-meal peak within 3 h of the first bite
+MEAL_FIT_HORIZONS = [15, 30, 45, 60, 90, 120, 150, 180]   # minutes after a meal that the fit is scored on
+MEAL_LEARN_MIN_HISTORY = 3   # meals needed before the twin is personalised (fewer -> population average)
+MEAL_MIN_COVERAGE = 0.60     # need >=60% of CGM readings in the response window to score a meal
+
+# ---------------------------------------------------------------- food composition (Step 2)
+# Two extra per-person parameters. Both PRIORS ARE ZERO: the twin starts from "composition makes no
+# difference" and only moves if that person's own meals say otherwise. Bounds are one-sided because
+# fibre/fat/protein are expected to blunt and delay a carb peak, not sharpen or hasten it.
+#   fb = fibre blunting : peak amplitude x 1/(1 + fb * fibre/(net_carbs+1))
+#   fd = fat/protein delay : time-to-peak x (1 + fd * (protein+fat)/(net_carbs+10))
+TWIN_COMP_PRIOR = {"fb": 0.0, "fd": 0.0}
+TWIN_COMP_PRIOR_SD = {"fb": 1.0, "fd": 0.5}
+TWIN_COMP_BOUNDS = {"fb": (0.0, 4.0), "fd": (0.0, 1.5)}
+
+# ---------------------------------------------------------------- eating order (Step 3)
+# NOT learned from this dataset: the BIG IDEAs food logs record what and when, never in what order.
+# Literature-based and deliberately CONSERVATIVE. Shukla AP, Iliescu RG, Thomas CE, Aronne LJ,
+# "Food Order Has a Significant Impact on Postprandial Glucose and Insulin Levels",
+# Diabetes Care 2015;38(7):e98-e99, doi:10.2337/dc15-0429 - a crossover study in 11 adults with
+# type 2 diabetes reporting 29-37% lower glucose at 30-60 min and a 73% lower 0-120 min incremental
+# AUC when vegetables and protein were eaten before carbohydrate.
+# We apply 25% to the peak RISE for vegetables-and-protein-first, well below that study's 29-37%,
+# because n=11, the meal was a Western one, and our cohort is not diabetic. Treat as illustrative.
+ORDER_PEAK_MULTIPLIER = {"Carbs first": 1.00, "Mixed": 0.90, "Vegetables & protein first": 0.75}
+ORDER_DELAY_MULTIPLIER = {"Carbs first": 1.00, "Mixed": 1.08, "Vegetables & protein first": 1.20}
+ORDER_DEFAULT = "Mixed"
+ORDER_SOURCE_NOTE = ("Order effect: based on published research (Shukla et al., Diabetes Care 2015), "
+                     "not learned from this dataset. With order logging, the twin would personalise this too.")
+
+# ---------------------------------------------------------------- Indian meal menu (Step 4)
+MENU_FILE = ROOT / "data" / "indian_meals.csv"
+
+# ---------------------------------------------------------------- menstrual cycle (women's-health module)
+# NOT learned from this dataset, and it cannot be: the BIG IDEAs release records no cycle, hormone or
+# menstrual field at all, and each person is recorded for only 6.9-9.9 days while a cycle is ~28 days.
+# You cannot observe a cycle - let alone compare phases within one person - in eight days of data.
+# So, exactly like ORDER_PEAK_MULTIPLIER above, this is a literature-based constant the doctor sets by
+# hand in the what-if simulator. It never touches the per-meal accuracy numbers or the LightGBM model.
+#
+# Evidence for lower insulin sensitivity in the luteal phase:
+#  - Valdes CT & Elkind-Hirsch KE, J Clin Endocrinol Metab 1991 (n=12 healthy women): insulin sensitivity
+#    5.03 +/- 0.72 (follicular) -> 2.22 +/- 0.45 (luteal), p<0.001.  https://pubmed.ncbi.nlm.nih.gov/10071420/
+#  - Dexcom G6 CGM, 49 people / 149 cycles: daily median glucose highest in the luteal phase and lowest
+#    in late-follicular.  https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10421863/
+#  - Apple Heart & Movement Study, 1,982 cycles: time-in-range 68.5% (follicular) vs 66.8% (luteal).
+#
+# Choosing the number: the insulin-sensitivity drop above is >50%, but that is Si, not a post-meal
+# glucose peak, and n=12. The CGM studies show mean-glucose differences of only a few mg/dL. We put the
+# post-meal effect deliberately between the two and at the low end: +15% on carb sensitivity and +3 mg/dL
+# on baseline in the luteal phase. Treat as illustrative, not as a measured effect in this cohort.
+CYCLE_PHASES = ["Unknown / not logged", "Follicular (day 1-14)", "Luteal (day 15-28)"]
+CYCLE_K_MULTIPLIER = {"Unknown / not logged": 1.00, "Follicular (day 1-14)": 1.00, "Luteal (day 15-28)": 1.15}
+CYCLE_BASELINE_SHIFT = {"Unknown / not logged": 0.0, "Follicular (day 1-14)": 0.0, "Luteal (day 15-28)": 3.0}
+CYCLE_DEFAULT = "Unknown / not logged"
+CYCLE_SOURCE_NOTE = (
+    "Cycle effect: based on published research, not learned from this dataset. These recordings are "
+    "7-10 days long and contain no cycle information, so the phase cannot be inferred - the doctor sets "
+    "it. With cycle logging, the twin would personalise this the way it personalises carb sensitivity.")

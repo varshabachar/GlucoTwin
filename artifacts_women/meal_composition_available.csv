@@ -1,0 +1,10 @@
+pid,meals,net_carbs,fiber,sugar,protein,fat
+001,41,100% non-zero,7% non-zero,98% non-zero,100% non-zero,7% non-zero
+003,30,100% non-zero,all zero,100% non-zero,93% non-zero,all zero
+004,25,96% non-zero,88% non-zero,96% non-zero,100% non-zero,100% non-zero
+005,45,100% non-zero,78% non-zero,96% non-zero,98% non-zero,98% non-zero
+006,47,100% non-zero,100% non-zero,100% non-zero,100% non-zero,100% non-zero
+007,36,100% non-zero,100% non-zero,86% non-zero,100% non-zero,100% non-zero
+008,30,100% non-zero,100% non-zero,100% non-zero,100% non-zero,100% non-zero
+010,72,97% non-zero,64% non-zero,89% non-zero,89% non-zero,86% non-zero
+015,0,column absent,column absent,column absent,column absent,column absent
