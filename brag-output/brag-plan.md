@@ -6,6 +6,16 @@ yc-parody would undercut it. Restraint reads as credibility here.
 **Music:** `happy-beats-business-moves-vol-9` (114.84 BPM). Every scene cut lands on a strong
 beat from the bundled cue grid: 0.00 / 4.23 / 8.44 / 12.65 / 16.86 / 21.06.
 
+## v2 — rebuilt on the real UI
+
+Replaced the synthetic-graphic cut. Every scene is now a **real capture of the running
+dashboard**, driven with Playwright (headless Chrome won't render Streamlit — it screenshots the
+skeleton loader), then moved with Ken Burns crops and animated highlights mapped from source
+coordinates. Focus per the brief: **the actual demo, and the women's-health module.**
+
+Scenes: ward at day 3 20:00 (2 alerts, P-009 at 79.69%) → Plan a meal, 146 vs 135 → the cycle
+panel with its post-menopausal warning → luteal, 146→153 / 142→148 / 135→141 → sign-off.
+
 ## Angle
 
 Lead with the failure of the thing people already have. A CGM is not useless — it is *late*.
