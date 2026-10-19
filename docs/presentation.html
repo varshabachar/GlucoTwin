@@ -119,8 +119,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   <p class="lede">A patient digital twin that warns of glucose spikes two hours ahead by fusing health
   records with wearable data — and tells the doctor what would change the outcome.</p>
   <div class="meta"><b>Varsha B S Acharya</b> · <b>Amogh P</b> · Team Uno · RV University, Bengaluru</div>
-  <div class="note"><span class="lbl">Say</span>Hello. I'm Varsha B S Acharya from RV University, Bengaluru, and this is GlucoTwin — my submission for the Happiest Health Digital Twin Challenge, Phase 1. Team name is Uno, and I'm a team of one.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Hi. I'm Varsha, from RV University in Bengaluru. This is GlucoTwin. It's my Phase 1 submission for the Happiest Health Digital Twin Challenge.</div></section>
 
 <!-- 2 -->
 <section class="slide">
@@ -132,8 +131,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <div><div class="v c-blue">2×</div><div class="k">times a year a doctor sees them</div></div>
   </div>
   <p class="lede">ICMR-INDIAB national survey, <i>Lancet Diabetes &amp; Endocrinology</i>, 2023.</p>
-  <div class="note"><span class="lbl">Say</span>India has an estimated <b>101 million people living with diabetes</b>, and <b>136 million with prediabetes</b> — from the ICMR-INDIAB national survey, 2023. A hundred and thirty-six million people who are not diabetic yet, and for most of them, whether they become diabetic is still modifiable. In prediabetes the early warning sign is the post-meal glucose spike. Repeated often enough, that pattern is what progresses toward type 2 diabetes.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Let me start with the number that made me build this. About 101 million people in India have diabetes. Another 136 million have prediabetes. That second group is the one I care about. They're not diabetic yet, and for most of them it can still be turned around. The early warning sign is the spike you get after a meal.</div></section>
 
 <!-- 3 -->
 <section class="slide">
@@ -145,16 +143,14 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <li>A simple CGM trend alarm does warn early — at <b>6.8 false alarms per day</b>. Nobody keeps listening to that.</li>
   </ul>
   <p class="lede"><b>Can we warn two hours ahead — and say what to do about it?</b></p>
-  <div class="note"><span class="lbl">Say</span>Here's the gap. A doctor sees that patient maybe twice a year. And a CGM will tell you about a spike, but only once it's already happening. So the question I set out to answer is: can you warn someone two hours before the spike, early enough to do something about it? And the second question, which turned out to matter more: can you tell them what to do about it, specifically, for their body?</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>So here's the problem. A doctor sees you twice a year, and gets one HbA1c — a three-month average. Everything in between, they don't see. A glucose monitor is better, every five minutes. But it only tells you about a spike once it's happening. By then you've eaten. You could warn earlier by following the trend. I tried. It catches nearly every spike, but gives you about seven false alarms a day. Nobody listens to that. So I wanted two things. Warn two hours early. And say what to do about it.</div></section>
 
 <!-- 4 -->
 <section class="slide">
   <div class="eyebrow">The system</div>
   <h2>Static record + live sensors → a twin per patient</h2>
   <div class="figwrap"><img class="fig" src="architecture.png" alt="GlucoTwin architecture"></div>
-  <div class="note"><span class="lbl">Say</span>A digital twin here means two things fused. The static stream — the health record, who the patient is. And the dynamic streams — a Dexcom G6 CGM every five minutes, an Empatica E4 wristband for heart rate and HRV, and a meal log. What the patient is doing right now. Those fuse onto a single five-minute grid. The health record is ingested as a FHIR R4 bundle — LOINC, SNOMED, RxNorm — because that's the standard India's ABDM is built on. Then two things in parallel: a per-patient physiological twin, and a LightGBM fusion model. On the right is what a doctor sees. A classifier tells you <i>that</i> something will happen. A twin lets you ask <i>what if</i>.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Here's how it fits together. On the left, two kinds of data. The health record — age, labs, diagnoses, medicines. That's who the patient is. And live sensors — a glucose monitor every five minutes, a wristband, and a meal log. That's what they're doing now. Both get lined up on the same five-minute grid. The health record goes in as a FHIR bundle, which is the standard India's ABDM uses. Then two things read it. A twin, which I'll come to. And a model that predicts the spike. On the right is what the doctor sees: a risk score, the reason for it, and a what-if tool. That last one is the point. A model tells you something will happen. A twin lets you ask what if.</div></section>
 
 <!-- 5 -->
 <section class="slide">
@@ -170,8 +166,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   </table>
   <p class="lede"><b>16 participants · 8–10 days each · 38,115 five-minute rows · 22% followed by a spike.</b>
   No real patient record is used anywhere (DPDP Act / HIPAA sandbox).</p>
-  <div class="note"><span class="lbl">Say</span>Let's be precise, because this is where projects like this overclaim. The glucose, heart rate, beat-to-beat intervals and food logs are real, de-identified human data from PhysioNet. Sixteen participants, eight to ten days each. Sex and HbA1c are real too. Everything in the third row is synthetic — I generate it, because the sandbox rules don't allow real patient records. But I generate it consistently with each person's real HbA1c. Keep that twenty-two percent in your head — it's what random guessing would score.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>I want to be clear about what's real, because this is where people oversell. The glucose, heart rate and food logs are real, from a public dataset called BIG IDEAs. Sixteen people, eight to ten days each. Their sex and HbA1c are real too. Everything in that third row I generate — age, labs, diagnoses, medicines. The rules don't allow real patient records. But I match them to each person's real HbA1c. That's about 38,000 rows. Twenty-two percent are followed by a spike. Remember that number — it's what guessing would score.</div></section>
 
 <!-- 6 -->
 <section class="slide">
@@ -183,8 +178,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <li><b>Coverage.</b> <b>Participant 015's entire food log falls outside their CGM recording</b> → marked <i>unavailable</i>, meaning "unknown", not "never ate".</li>
   </ul>
   <p class="lede">Tested on a deliberately broken copy: every offset recovered exactly, AUROC back to within <b>0.01</b>.</p>
-  <div class="note"><span class="lbl">Say</span>Two minutes on something that isn't in most projects, because it nearly broke mine. Three devices, each keeping its own clock. If those streams are misaligned and you don't check, the model quietly learns nothing and you never find out. So I check explicitly and print the report. Tell a model someone ate zero carbs when you simply don't know, and you've taught it something false.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Now something boring that almost broke this. Three devices: a glucose monitor, a wristband, a phone. Each keeps its own time, and in a public dataset those times get shifted for privacy. If they don't line up and you don't check, your model quietly learns nothing. So I check, and print a report. One person logged meals 105 minutes late. Another's food log didn't overlap their glucose data at all, so I mark it unknown — not 'they ate nothing'. Tell a model someone ate zero carbs when you don't know, and you've taught it something false.</div></section>
 
 <!-- 7 -->
 <section class="slide">
@@ -197,8 +191,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <li>Every rolling statistic is past-only — even the resting heart rate behind the activity estimate.</li>
   </ul>
   <p class="lede">This is the difference between a glucose model that works and one that is cheating without its author realising.</p>
-  <div class="note"><span class="lbl">Say</span>About sixty features. Every wearable feature is expressed relative to that person's own normal — their trailing three days — not raw values. Relative features ask the right question: is this person unusual for them, right now? And the single most important rule in this codebase: a feature at time T may only use data from time T or earlier. Only the label looks forward. It's enforced right down to the binning.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>About sixty features go in. Two decisions matter. First, every wristband feature is measured against that person's own normal, not raw. Resting heart rate varies more between people than within one. Feed in raw numbers and the model mostly learns who someone is — which looks great in testing and is useless on a new patient. Second, nothing sees the future. A reading at twelve-oh-five uses data up to twelve-oh-five, not a second more. That sounds obvious. It's the difference between a model that works and one that's cheating without you realising.</div></section>
 
 <!-- 8 -->
 <section class="slide">
@@ -222,8 +215,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   </div>
   <p class="lede">Starts at the population average, then <b>re-fitted every day on that patient's own past data only</b>.
   Only its <i>forecasts</i> feed the ML model — the four parameters are constant per person and would act as an ID card.</p>
-  <div class="note"><span class="lbl">Say</span>For each patient, glucose is modelled as four things added together. Those four numbers are the twin. Everyone starts at the population average — 1.0 mg/dL per gram, peaking at forty-five minutes — then it's re-fitted every day on that patient's own past data only. One deliberate restriction: only the twin's time-varying forecasts go into the machine learning model. The four personal parameters do not — they're constant within a person, so to the model they'd work as an ID card.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>So, the twin. For each person, it's four numbers. How much their glucose goes up per gram of carbs. How quickly they peak. How much exercise helps them. And how fast they come back down. That's it. Four numbers, and they're different for every person. Everyone starts at the population average. Then every day it refits those numbers using only that person's own past data. So it learns you, a day at a time. One thing I deliberately left out: the four numbers don't go into the prediction model. They don't change much within a person, so the model would just use them as a name tag.</div></section>
 
 <!-- 9 -->
 <section class="slide">
@@ -234,8 +226,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <li>Random row splits put the same person in train and test and <b>inflate every score</b>. Don't.</li>
     <li><b>Alert thresholds chosen by inner cross-validation on the training patients only</b> — nothing about the test patient leaks into the model or the alarm.</li>
   </ul>
-  <div class="note"><span class="lbl">Say</span>How it's measured matters as much as what it is. Leave-one-subject-out: train on fifteen people, test on the sixteenth, repeat sixteen times. So every number you're about to see comes from a model that has never seen the patient it's scoring. That's the honest way to evaluate a medical model. The alert thresholds are also chosen on the training patients only.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Before the results, how I tested them. I train on fifteen people and test on the sixteenth. Then I repeat that sixteen times. So every number you're about to see came from a model that had never seen that patient. If you shuffle rows randomly instead, the same person ends up in training and testing, and your scores look much better than they are.</div></section>
 
 <!-- 10 -->
 <section class="slide">
@@ -252,8 +243,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   </table>
   <p class="lede">AUPRC baseline (random) = <b>0.22</b>. Original locked run reported 0.733; re-running on
   LightGBM 4.7 / pandas 3.0 gives 0.728 — gradient boosting is not bit-reproducible across versions.</p>
-  <div class="note"><span class="lbl">Say</span>Read this top to bottom. Row one is what a simple CGM alarm does — AUROC 0.612, and <b>6.8 false alarms per patient per day</b>. That's alarm fatigue. CGM alone with machine learning: 0.681. Wearables: 0.667, it goes down, and I'll explain. Meal log: 0.708, biggest single jump. Full fusion: 0.728, with about 2 false alarms a day. So from 0.612 to 0.728, and from 6.8 false alarms down to two, warning of 86% of spikes a median of 45 minutes ahead.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Here are the results. Each row adds one more kind of data. The first row is the simple trend alarm: 0.612, and almost seven false alarms a day. Glucose alone with machine learning, 0.681. Add the meal log and it jumps to 0.708 — the biggest single jump here. Add the health record, 0.728, with about two false alarms a day. So 0.612 up to 0.728, false alarms seven a day down to two, and it catches 86 percent of spikes about 45 minutes ahead.</div></section>
 
 <!-- 11 -->
 <section class="slide">
@@ -262,8 +252,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   <div class="figwrap"><img class="fig" src="../artifacts/figures/ablation.png" alt="Ablation chart"></div>
   <p class="cap">Adding wearables drops the score because the accelerometer files (~13 GB) weren't downloaded —
   activity is estimated from heart rate, which also rises with stress and after meals. They still contribute inside the full fusion.</p>
-  <div class="note"><span class="lbl">Say</span>Two honest readings. Wearables going down: in this build the accelerometer files weren't downloaded — about thirteen gigabytes — so activity is estimated from heart rate, which is a noisy proxy. And the AUPRC column: random guessing scores 0.22 here, full fusion gets 0.478, a bit over twice baseline. Also note adding the twin's forecasts didn't improve the score — 0.725 against 0.728, well inside the noise for sixteen people. I'm reporting that rather than hiding it, because the twin's value isn't the score. It's the simulation.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Two honest things here. Adding the wristband made it slightly worse. I didn't download the movement sensor files — thirteen gigabytes — so I estimate activity from heart rate, which also rises when you're stressed or eating. It's a noisy stand-in. And adding the twin's forecasts didn't improve the score either. 0.725 against 0.728, which with sixteen people is noise. I'm telling you rather than hiding it, because the twin's value isn't the score. It's what you can do with it.</div></section>
 
 <!-- 12 -->
 <section class="slide">
@@ -279,8 +268,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
       <i>onset</i>, not announcing what the CGM already shows.</p>
     </div>
   </div>
-  <div class="note"><span class="lbl">Say</span>This is what a doctor actually sees. A ward list of sixteen patients, with a replay clock in the sidebar walking through the recorded week as if it were live. It's day three, eight in the evening — two in red, five on watch, two already above 140. Patient 009, risk eighty percent. And the column that makes this usable is the last one: the reason. He ate forty-seven grams of carbohydrate ten minutes ago, and his twin already expects him over the line in an hour. These aren't hand-written rules — they're SHAP values from the model that never saw him, translated into plain language. And notice the two marked "in spike": they're already above 140, and the system doesn't alert on them, because the job is predicting onset, not announcing something the sensor is already showing.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>This is what a doctor sees. Sixteen patients, sorted by risk. The clock in the sidebar replays the recorded week as if it were live. Right now, day three, eight in the evening. Two in red, five on watch. Patient 009 is at eighty percent. And this last column tells you why. His twin expects him at 142 within the hour, and he ate 47 grams of carbs ten minutes ago. Those reasons come out of the model itself. I just put them in plain English. The two marked 'in spike' are already over 140. No alert, on purpose — the job is predicting it starting, not announcing what the sensor already shows.</div></section>
 
 <!-- 13 -->
 <section class="slide">
@@ -294,8 +282,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   </ul>
   <p class="lede">No leakage, and it is <b>tested, not asserted</b>: a script deletes future meals and future glucose
   and checks neither the forecast nor the fitted parameters move. <b>192 + 53 probes, all unchanged.</b></p>
-  <div class="note"><span class="lbl">Say</span>This is the part I'm most pleased with, and it's new. Before each meal it predicts the peak using parameters fitted on that person's earlier meals only. After the meal, the CGM records what really happened. Then it re-fits. And the claim all of this rests on is that the twin never sees the future — so I don't just assert it. There's a script that deletes future meals and future glucose and checks that neither the forecast nor the fitted parameters move.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>This next part is the newest bit, and my favourite. The twin I described refits once a day. But people don't live in days. They live in meals. So this version learns meal by meal. Before you eat, it predicts your peak, using only the meals it has already seen from you. After you eat, the sensor says what actually happened. Then it adjusts.</div></section>
 
 <!-- 14 -->
 <section class="slide">
@@ -307,8 +294,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <div><div class="v c-blue">25.2</div><div class="k">mg/dL — learns each meal (−22%, CI 4.1–10.6, helped 13/15)</div></div>
     <div><div class="v" style="color:var(--mute)">+0.12</div><div class="k">mg/dL from food composition — CI includes zero. <b>Did not help.</b></div></div>
   </div>
-  <div class="note"><span class="lbl">Say</span>Over 431 real meals from 15 participants, a generic population twin gets the peak wrong by 32.5 mg/dL. The twin that learns each meal: 25.2. A 22% reduction, bootstrap confidence interval 4.1 to 10.6, so it isn't chance, and it helped 13 of the 15 patients. Over the later half of each person's meals the generic twin drifts to 35.2 while the learning twin holds at 24.8. Now a negative result, which I'm reporting because it's true: I also let the twin use fibre, fat and protein. The improvement was 0.12 mg/dL with a confidence interval that includes zero. It did not measurably help — fibre is barely logged by several participants, and fifteen people is too few for two extra parameters.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>431 real meals, fifteen people. A generic twin gets the peak wrong by about 32 and a half. The one that learns you, by 25. That's 22 percent better, and it helped thirteen of fifteen. Now the honest part. I also tried using fibre, fat and protein from each meal. That made basically no difference — about a tenth of a point, easily chance. It didn't work, and I'm showing you instead of quietly dropping it.</div></section>
 
 <!-- 15 -->
 <section class="slide">
@@ -325,8 +311,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
       <p>Her twin: <b>k = 0.44</b> mg/dL per g, peak at <b>65 min</b> — learned from <b>21 of her own meals</b>.</p>
     </div>
   </div>
-  <div class="note"><span class="lbl">Say</span>Here is where the twin earns its place. Patient five — her HbA1c is 5.7, real, in the prediabetes range. Her twin has learned from twenty-one of her own meals: carb sensitivity 0.44, peaking at sixty-five minutes, slower than the population's forty-five. Now look at the status: the alarm says twenty-four percent, green, stable. Nothing here needs a doctor. But she's about to eat rice, dal and sabzi. Rice first — projected peak 146, that crosses the line. Dal and sabzi first — 135, she stays under. Same food, same patient, same afternoon, and about ten milligrams per decilitre between crossing and not — on a patient the alarm had already called stable. That is something a classifier alone cannot give you.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>This is the bit I most want you to see. Look at her status first. Twenty-four percent. Green. Stable. The alarm says nothing's wrong. She last ate five hours ago. But she's about to eat rice, dal and sabzi, and her twin has learned her from twenty-one of her own meals. Rice first, it expects 146. Over the line. Dal and sabzi first, 135. She stays under. Same food, same person, same afternoon — and the alarm had already said she was fine.</div></section>
 
 <!-- 16 -->
 <section class="slide">
@@ -338,8 +323,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <li>I apply <b>25%</b> — deliberately below their figure, because eleven people eating a Western meal is not this cohort.</li>
     <li>One named constant: <code>config.ORDER_PEAK_MULTIPLIER</code>. Change it or switch it off.</li>
   </ul>
-  <div class="note"><span class="lbl">Say</span>I want to be straight about this. The order effect is not learned from this data — these food logs record what and when, never in what order. It comes from a published crossover trial of eleven patients with type 2 diabetes. They reported 29 to 37 percent lower glucose; I apply 25 percent, deliberately below their figure. It's one named constant in config.py, and the dashboard labels it on screen every time. If order were logged, the twin would personalise this the way it personalises carb sensitivity.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Now I have to be straight with you about this one, and the app says it on screen too. The eating-order effect is not something I learned from this data. These food logs record what people ate and when, but never in what order. So I can't learn it. It comes from a published study — eleven people with type 2 diabetes. They found 29 to 37 percent lower glucose when vegetables and protein came first. I use 25 percent, which is deliberately lower than what they found. It's one number in my config file. You can change it or switch it off.</div></section>
 
 <!-- 17 -->
 <section class="slide">
@@ -358,8 +342,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
       would let the twin <i>learn</i> this.</p>
     </div>
   </div>
-  <div class="note"><span class="lbl">Say</span>One more module, with a caveat I want to say out loud. Insulin sensitivity falls in the luteal phase, so the same meal peaks higher. But read the warning — this study enrolled only post-menopausal females. Every woman in this dataset is post-menopausal; none of them has a cycle. So this control isn't telling you anything about this patient. It's a capability demonstration. To actually learn it you'd need mcPHASES — forty-two women, three months each, daily hormone assays. That's in my future work.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>One more feature, with a caveat I'd rather say than bury. In the second half of the menstrual cycle, your body handles sugar worse. So the same meal peaks higher. For a tool aimed at prediabetes in India, where most people screened are women, that matters — and most models ignore it. But read the warning. This study only enrolled post-menopausal women. None of them has a cycle. So this tells you nothing about this patient. It's a demonstration of what the twin would do for a younger patient, and it's labelled that way. With that said — vegetables-first was 135, under the line. In the luteal phase it's 141. The same advice stops working.</div></section>
 
 <!-- 18 -->
 <section class="slide">
@@ -375,8 +358,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   <p class="lede">Full fusion falls to <b>0.654</b>, and the health record makes it <i>worse</i>. That's a
   <b>cohort-size effect, not a finding about women</b> — nine people, one with no usable food log.
   It's why the headline keeps all 16.</p>
-  <div class="note"><span class="lbl">Say</span>I also re-ran the whole pipeline on the nine women alone. Full fusion falls from 0.728 to 0.654, and the health record actually makes it worse rather than better. The "every stream helps" result does not replicate. That's a cohort-size effect, not a finding about women — nine people, one of whom has no usable food log. I'm showing it because running it was the honest way to answer "should this be a women's tool?", and the answer is that this dataset is too small to support one.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>I also ran the whole thing again using only the nine women. The score drops from 0.728 to 0.654. And the health record actually makes it worse, not better. So the 'every data stream helps' result doesn't hold up here. But that's about the size of the group, not about women. It's nine people, and one of them has no usable food log. I ran it because that's the honest way to answer 'should this be a women's tool', and the answer is that this dataset is too small to tell.</div></section>
 
 <!-- 19 -->
 <section class="slide">
@@ -390,8 +372,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <li><b>Eating order and cycle phase are published constants</b>, labelled on screen every time.</li>
     <li><b>Food composition didn't help</b> — reported as the negative result it is.</li>
   </ul>
-  <div class="note"><span class="lbl">Say</span>Let me close by arguing against my own project, because I'd rather you hear these from me. Sixteen people shows feasibility, not clinical validity. The health record is synthetic apart from sex and HbA1c. Activity and sleep are estimated. Unlogged meals can't be anticipated. The eating order and cycle effects are published constants, not learned here — and the dashboard says so on screen every time. And food composition didn't help, which I've reported as the negative result it is.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>Let me argue against my own project. Sixteen people shows this can work. It doesn't show it works clinically. The health record is made up, apart from sex and HbA1c. Sleep and activity are estimated from heart rate, not measured. If someone doesn't log a meal, I can't warn them. And the eating order and cycle effect come from published research, not this data — the app says so every time.</div></section>
 
 <!-- 20 -->
 <section class="slide">
@@ -406,8 +387,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   from mcPHASES · federated on-device training · hypoglycaemia alerts.</p>
   <p class="lede">Decision support, not a prescription. Not a medical device. Deployment would need
   prospective validation and regulatory review.</p>
-  <div class="note"><span class="lbl">Say</span>What I think this does show: that fusing a health record with wearable streams beats glucose alone — 0.612 to 0.728 — and cuts a basic CGM alarm's 6.8 false alarms a day down to about two. That a physiological twin can learn a person meal by meal and get 22% better at predicting their peaks. And that the result is a tool which doesn't just say "she will spike", but "if she eats the dal before the rice, she won't." Thank you for watching.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>So what does it show. Combining a health record with sensor data beats glucose alone — 0.612 up to 0.728 — and cuts false alarms from seven a day to two. A twin can learn a person meal by meal and get 22 percent better at their peaks. And you get something that doesn't just say 'she's going to spike', but 'if she eats the dal before the rice, she won't'. This is decision support. Not a prescription, and not a medical device.</div></section>
 
 <!-- 21  HANDOFF: play the clip -->
 <section class="slide demo">
@@ -417,10 +397,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <li>Switch to <code>brag-output/brag.mp4</code> and play it full screen, with sound.</li>
     <li>Then come straight back here and move to the live demo.</li>
   </ul>
-  <div class="note"><span class="lbl">Do</span>Alt-tab to the video. Play it full screen with sound. Come back when it ends.
-  <span class="lbl" style="margin-top:1.4vh">Say before</span>Before I show you the system running, here it is in twenty-one seconds.
-  <span class="lbl" style="margin-top:1.4vh">Say after</span>Everything in that clip is the real dashboard, and every number in it comes from the artifacts in the repository. Let me now show you the same thing live, so you can see it is not a video trick.</div>
-</section>
+  <div class="note"><span class="lbl">Do</span>Alt-tab to the video. Play it full screen with sound. Come back when it ends.<span class="lbl" style="margin-top:1.4vh">Say</span>Before I show you it running, here's the whole thing in twenty seconds. Everything in that clip is the real dashboard. Let me show you it live now, so you can see it's not a video trick.</div></section>
 
 <!-- 22  HANDOFF: live demo -->
 <section class="slide demo">
@@ -434,9 +411,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     <li><b>Cycle phase</b> → read the warning → Luteal</li>
     <li><b>Model performance</b> → ablation + per-meal table</li>
   </ul>
-  <div class="note"><span class="lbl">Do</span>Alt-tab to Chrome. Follow the live-demo script in docs/VIDEO_SCRIPT.md, part 3.
-  <span class="lbl" style="margin-top:1.4vh">Say</span>Let me show you it running. Nothing here is pre-recorded — this is the dashboard on my machine, reading the artifacts the pipeline produced.</div>
-</section>
+  <div class="note"><span class="lbl">Do</span>Alt-tab to Chrome. Follow the live-demo script.<span class="lbl" style="margin-top:1.4vh">Say</span>Let me show you it running. Nothing here is pre-recorded — this is the dashboard on my machine.</div></section>
 
 <!-- 23 -->
 <section class="slide title">
@@ -448,8 +423,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
     github.com/varshabachar/Uno_RVUniversity<br>
     Data: BIG IDEAs Lab Glycemic Variability &amp; Wearable Device Data, PhysioNet (ODC-By)
   </div>
-  <div class="note"><span class="lbl">Say</span>Thank you for watching. Everything — the code, the data provenance, every result, and the leakage test — is in the repository.</div>
-</section>
+  <div class="note"><span class="lbl">Say</span>That's it. Thanks for watching. The code, the data, every result and the leakage test are all in the repository.</div></section>
 
 <div class="hud"><b id="cur">1</b> / <span id="tot">23</span></div>
 <div class="help"><kbd>→</kbd> next · <kbd>←</kbd> back · <kbd>N</kbd> notes · <kbd>F</kbd> fullscreen</div>
