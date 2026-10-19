@@ -64,9 +64,9 @@ model = box(8.2, 2.95, 3.4, 1.95, "Fusion model",
             "LightGBM · ~60 features\nCGM + wearable + meals + EHR + twin\nleave-one-subject-out validated\nthreshold set by inner CV", "brain")
 shap = box(8.2, 1.0, 3.4, 1.55, "Explainability", "TreeSHAP per alert\nplain-language reasons", "brain")
 
-whatif = box(12.1, 5.40, 3.3, 1.70, "What-if / plan a meal",
-             "meal size x post-meal walk\nIndian meal menu (approximate)\neating order (published research,\nnot learned here)\n-> projected peak", "out")
-risk = box(12.1, 3.95, 3.3, 1.3, "Early warning", "2-hour spike risk + alert\npatient-specific threshold", "out")
+whatif = box(12.1, 5.25, 3.3, 1.85, "What-if / plan a meal",
+             "meal size x post-meal walk\nIndian meal menu (approximate)\neating order + cycle phase:\npublished research, NOT learned\nhere (cohort is post-menopausal)\n-> projected peak", "out")
+risk = box(12.1, 3.85, 3.3, 1.3, "Early warning", "2-hour spike risk + alert\npatient-specific threshold", "out")
 why = box(12.1, 2.35, 3.3, 1.3, "Why", "top reasons, e.g. 'large lunch,\nshort sleep, low activity'", "out")
 dash = box(12.1, 0.55, 3.3, 1.5, "Doctor dashboard",
            "ward view · patient twin timeline\nperformance · FHIR record viewer", "out")

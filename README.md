@@ -3,6 +3,45 @@
 ### A patient digital twin that warns of glucose spikes 2 hours ahead by fusing health records with wearable data
 
 > Happiest Health **Digital Twin Challenge 2026** · Phase 1: Prototype & Code Submission
+> **Team Uno** · Varsha B S Acharya · Amogh P · RV University, Bengaluru
+
+---
+
+## System architecture
+
+![GlucoTwin system architecture](docs/architecture.png)
+
+<sub>**This diagram as a PDF:** [`docs/architecture.pdf`](docs/architecture.pdf) · it is also slide 4 of
+[`docs/presentation.pdf`](docs/presentation.pdf) · regenerate either with `python scripts/make_architecture.py`.
+Section 5 adds a step-by-step walk through the same pipeline.</sub>
+
+## One-minute product tour
+
+<a href="brag-output/showcase.mp4">
+  <img src="brag-output/showcase.jpg" width="620" alt="Play the one-minute GlucoTwin showcase">
+</a>
+
+**[▶ Play the showcase — 1:08](brag-output/showcase.mp4)** · what the product does and who it is for, in a
+minute. The full **15-20 minute demo video** required for judging is in [section 4](#4-demo-video).
+
+---
+
+## Submission checklist — where each required item lives
+
+| Required item | Where it is |
+|---|---|
+| Team details | [§1](#1-team-details) — Team Uno, 2 members |
+| College / incubator information | [§1](#1-team-details) — RV University, Bengaluru; no incubator |
+| Project title | [§2](#2-project-title) |
+| Problem statement | [§3](#3-problem-statement-and-healthcare-use-case) |
+| Healthcare use case | [§3](#3-problem-statement-and-healthcare-use-case) |
+| Technical stack | [§6](#6-technical-stack-and-models) |
+| AI/ML model or framework details | [§6](#6-technical-stack-and-models) (models, features, validation) · [§5](#5-how-it-works) (twin equation) · [§7](#7-results) (measured outcomes) |
+| 15-20 minute demo video, unlisted on YouTube | [§4](#4-demo-video) |
+| Open-source licence details | [§15](#15-license) · [`LICENSE`](LICENSE) — MIT |
+| Architecture diagram (PDF) | [top of this README](#system-architecture) · [`docs/architecture.pdf`](docs/architecture.pdf) |
+| Presentation (PDF) covering details and outcomes | [`docs/presentation.pdf`](docs/presentation.pdf), 23 slides — see [§14](#14-presentation) |
+| All files and links publicly accessible | This repository is **public**. The dataset is PhysioNet **open access** (no DUA, no credentialing). The deck, the architecture PDF and the showcase video are committed here, not behind a drive link. |
 
 ---
 
@@ -12,8 +51,10 @@
 |---|---|
 | **Team name** | Uno |
 | **Team leader** | Varsha B S Acharya |
+| **Team member** | Amogh P |
+| **Team size** | 2 |
 | **College** | RV University, Bengaluru |
-| **Team size** | 1 |
+| **Incubator** | Not applicable — student team, no incubator affiliation |
 
 ## 2. Project title
 
@@ -32,7 +73,11 @@ India has an estimated **101 million people with diabetes and 136 million with p
 
 ## 4. Demo video
 
-▶️ **✏️ unlisted YouTube link** (15-20 minutes)
+▶️ **✏️ unlisted YouTube link — to be added** (15-20 minutes)
+
+The video walks through the deck, a short clip of the running dashboard, and then a live demo on the
+real dashboard. Its run sheet and the spoken script are in [`docs/VIDEO_SCRIPT.md`](docs/VIDEO_SCRIPT.md).
+For a one-minute version of the same story, see the [product tour](#one-minute-product-tour) at the top.
 
 ## 5. How it works
 
@@ -58,7 +103,7 @@ flowchart LR
   G & H & I --> J["Doctor dashboard (Streamlit)"]
 ```
 
-Full diagram (PDF): [`docs/architecture.pdf`](docs/architecture.pdf)
+Full architecture diagram: [at the top of this README](#system-architecture), as a PDF in [`docs/architecture.pdf`](docs/architecture.pdf), and as slide 4 of [`docs/presentation.pdf`](docs/presentation.pdf).
 
 ### Clock alignment: making sure the streams line up
 The CGM, the wristband and the phone meal log each keep their own clock, and in the public dataset they don't always agree. Before modelling, `src/align.py` checks each person and prints a report (also in the dashboard's *Data & compliance* page):
@@ -440,7 +485,7 @@ python run_pipeline.py --women
 
 ## 14. Presentation
 
-📑 [`docs/presentation.pdf`](docs/presentation.pdf) — 21 slides, exported from
+📑 [`docs/presentation.pdf`](docs/presentation.pdf) — 23 slides, exported from
 [`docs/presentation.html`](docs/presentation.html), which is the live deck: open it in a browser,
 arrow keys to navigate, **N** for speaker notes, **F** for fullscreen. Slides marked *LIVE DEMO*
 are the points where the walkthrough switches to the running dashboard.
