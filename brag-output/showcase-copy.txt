@@ -1,0 +1,18 @@
+A glucose monitor tells you that you crossed 140. It tells you at the exact moment it
+happens — which is the one moment you can no longer do anything about it.
+
+GlucoTwin warns two hours earlier, and then tells you what would change it.
+
+It builds a digital twin of each patient from their health record plus live glucose,
+wearable and meal data, and learns that person meal by meal: predict the peak before
+they eat, compare with what the sensor recorded, refit.
+
+AUROC 0.612 → 0.728. False alarms cut from nearly seven a day to two. 86% of spikes
+caught, a median 45 minutes ahead. And across 431 real meals, the error in the predicted
+peak fell 22%.
+
+Then the part a risk score can't do: rice first, projected 146 — dal and sabzi first,
+135. Same plate, same afternoon, on a patient the alarm had already called stable.
+
+Built for the Happiest Health Digital Twin Challenge 2026. Open data,
+leave-one-subject-out, and a script that proves the twin never sees the future.
