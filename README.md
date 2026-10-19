@@ -440,7 +440,10 @@ python run_pipeline.py --women
 
 ## 14. Presentation
 
-📑 [`docs/presentation.pdf`](docs/presentation.pdf)
+📑 [`docs/presentation.pdf`](docs/presentation.pdf) — 21 slides, exported from
+[`docs/presentation.html`](docs/presentation.html), which is the live deck: open it in a browser,
+arrow keys to navigate, **N** for speaker notes, **F** for fullscreen. Slides marked *LIVE DEMO*
+are the points where the walkthrough switches to the running dashboard.
 
 ## 15. License
 
