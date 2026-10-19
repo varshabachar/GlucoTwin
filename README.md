@@ -41,7 +41,7 @@ minute. The full **15-20 minute demo video** required for judging is in [section
 | Open-source licence details | [§15](#15-license) · [`LICENSE`](LICENSE) — MIT |
 | Architecture diagram (PDF) | [top of this README](#system-architecture) · [`docs/architecture.pdf`](docs/architecture.pdf) |
 | Presentation (PDF) covering details and outcomes | [`docs/presentation.pdf`](docs/presentation.pdf), 23 slides — see [§14](#14-presentation) |
-| All files and links publicly accessible | This repository is **public**. The dataset is PhysioNet **open access** (no DUA, no credentialing). The deck, the architecture PDF and the showcase video are committed here, not behind a drive link. |
+| All files and links publicly accessible | This repository is **public**, and the [live dashboard](https://unorvuniversity-cq555zzh326xqbgrkcwvon.streamlit.app/) is public. The dataset is PhysioNet **open access** (no DUA, no credentialing). The deck, the architecture PDF and the showcase video are committed here, not behind a drive link. |
 
 ---
 
@@ -379,7 +379,11 @@ streamlit run app/dashboard.py
 - **Data & compliance:** data provenance and a viewer for each patient's FHIR record.
 - A **replay clock** walks through the recorded week as if live. Predictions never use data after the clock time.
 
-Live demo: ✏️ Streamlit Community Cloud link
+🌐 **[Live demo — run the dashboard in your browser](https://unorvuniversity-cq555zzh326xqbgrkcwvon.streamlit.app/)** (Streamlit Community Cloud)
+
+No install, no data download: the deployed app runs from the committed `artifacts/` folder alone.
+Free Streamlit apps sleep after a period of inactivity — if you get a "wake this app" screen, give it
+about 40 seconds.
 
 ## 10. Data and sandbox compliance (DPDP Act / HIPAA)
 
