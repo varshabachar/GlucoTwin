@@ -56,6 +56,18 @@ tr.base td{color:var(--mute)}
 .pill.demo{background:var(--orange)}
 .pill.warn{background:var(--red)}
 
+/* screenshot slides: the real dashboard, with a caption rail beside or below it */
+.shotwrap{flex:1;min-height:0;display:flex;gap:2.4vw;align-items:center;margin-top:2vh}
+.shotwrap img{min-width:0;max-width:100%;max-height:64vh;object-fit:contain;
+  border:1px solid var(--line);border-radius:8px;box-shadow:0 2px 18px rgba(0,0,0,.10)}
+.shotwrap .side{flex:0 0 27%;min-width:0}
+.shotwrap .side p{font-size:2vh;line-height:1.45;color:var(--ink2);margin:0 0 1.6vh}
+.shotwrap .side b{color:var(--ink)}
+.callout{display:inline-block;font-family:var(--f-num);font-size:2.6vh;font-weight:600;
+  padding:.5vh 1.2vh;border-radius:6px;margin-bottom:1vh}
+.co-red{background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red)}
+.co-aqua{background:color-mix(in srgb,var(--aqua) 16%,transparent);color:var(--aqua)}
+.co-amber{background:color-mix(in srgb,var(--orange) 16%,transparent);color:var(--orange)}
 .slide.demo{background:#17191c;color:#f2f2f0}
 .slide.demo h1,.slide.demo h2{color:#fff}
 .slide.demo .lede,.slide.demo li{color:#c9c8c3}
@@ -253,19 +265,21 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   <div class="note"><span class="lbl">Say</span>Two honest readings. Wearables going down: in this build the accelerometer files weren't downloaded — about thirteen gigabytes — so activity is estimated from heart rate, which is a noisy proxy. And the AUPRC column: random guessing scores 0.22 here, full fusion gets 0.478, a bit over twice baseline. Also note adding the twin's forecasts didn't improve the score — 0.725 against 0.728, well inside the noise for sixteen people. I'm reporting that rather than hiding it, because the twin's value isn't the score. It's the simulation.</div>
 </section>
 
-<!-- 12 DEMO -->
-<section class="slide demo">
-  <span class="pill demo">Live demo</span>
-  <h2>The ward, at 8pm on day three</h2>
-  <ul>
-    <li>Switch to the dashboard → <b>Ward overview</b> → sidebar: <b>day 3, 20:00</b></li>
-    <li><b>2 alerts · 5 watch · 2 already above 140</b></li>
-    <li><b>P-009, risk 80%</b> — reason: <i>"Twin-projected glucose in 1 h — 142 mg/dL"</i>, 47 g carbs ten minutes ago</li>
-    <li>Reasons are <b>SHAP values</b> from the model that never saw that patient, in plain language</li>
-    <li>Then: cohort filter → <b>Women 9 / Men 7</b></li>
-  </ul>
-  <div class="note"><span class="lbl">Do</span>Alt-tab to Chrome. Ward overview, day 3, 20:00.
-  <span class="lbl" style="margin-top:1.4vh">Say</span>This is what a doctor actually sees, with a replay clock walking through the recorded week as if it were live. Two in red, five on watch, two already above 140. Patient 009, risk 80% — and the column that makes this usable: the reason. He ate forty-seven grams ten minutes ago and his twin already expects him over the line. These aren't hand-written rules, they're SHAP values translated into plain language. The two marked "in spike" are already above 140 — the system doesn't alert on them, because the job is predicting onset.</div>
+<!-- 12 -->
+<section class="slide">
+  <div class="eyebrow">The doctor's view</div>
+  <h2>Sixteen patients. Two about to spike.</h2>
+  <div class="shotwrap">
+    <img src="shots/01_ward_crop.png" alt="GlucoTwin ward overview">
+    <div class="side">
+      <span class="callout co-red">P-009 · 80%</span>
+      <p><b>"Twin-projected glucose in 1 h — 142 mg/dL."</b> He ate 47 g of carbs ten minutes ago.</p>
+      <p>Reasons are <b>SHAP values</b> from the model that never saw that patient, turned into plain language.</p>
+      <p>The two marked <b>in spike</b> are already above 140 — no alert, because the job is predicting
+      <i>onset</i>, not announcing what the CGM already shows.</p>
+    </div>
+  </div>
+  <div class="note"><span class="lbl">Say</span>This is what a doctor actually sees. A ward list of sixteen patients, with a replay clock in the sidebar walking through the recorded week as if it were live. It's day three, eight in the evening — two in red, five on watch, two already above 140. Patient 009, risk eighty percent. And the column that makes this usable is the last one: the reason. He ate forty-seven grams of carbohydrate ten minutes ago, and his twin already expects him over the line in an hour. These aren't hand-written rules — they're SHAP values from the model that never saw him, translated into plain language. And notice the two marked "in spike": they're already above 140, and the system doesn't alert on them, because the job is predicting onset, not announcing something the sensor is already showing.</div>
 </section>
 
 <!-- 13 -->
@@ -296,19 +310,22 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   <div class="note"><span class="lbl">Say</span>Over 431 real meals from 15 participants, a generic population twin gets the peak wrong by 32.5 mg/dL. The twin that learns each meal: 25.2. A 22% reduction, bootstrap confidence interval 4.1 to 10.6, so it isn't chance, and it helped 13 of the 15 patients. Over the later half of each person's meals the generic twin drifts to 35.2 while the learning twin holds at 24.8. Now a negative result, which I'm reporting because it's true: I also let the twin use fibre, fat and protein. The improvement was 0.12 mg/dL with a confidence interval that includes zero. It did not measurably help — fibre is barely logged by several participants, and fifteen people is too few for two extra parameters.</div>
 </section>
 
-<!-- 15 DEMO -->
-<section class="slide demo">
-  <span class="pill demo">Live demo</span>
+<!-- 15 -->
+<section class="slide">
+  <div class="eyebrow">Plan a meal · P-005, day 3, 16:00</div>
   <h2>"If she eats the dal before the rice, she won't spike"</h2>
-  <ul>
-    <li>Dashboard → <b>Patient twin</b> → <b>P-005</b> → day <b>3</b>, <b>16:00</b> → <b>Plan a meal</b> → Rice + dal + sabzi</li>
-    <li>The alarm says <b>24%, green, stable</b>. Nothing here needs a doctor.</li>
-    <li><b>Rice first → 146.</b> Crosses 140. &nbsp;&nbsp; <b>Dal and sabzi first → 135.</b> Stays under.</li>
-    <li>Largest safe portion: ~<b>115%</b> of this plate, eaten vegetables-first</li>
-    <li>Then: <b>Build your own</b> / <b>Describe it in words</b>, and <b>After the meal</b> → meal 7</li>
-  </ul>
-  <div class="note"><span class="lbl">Do</span>Patient twin → P-005 → day 3 → 16:00 → Plan a meal → Rice + dal + sabzi.
-  <span class="lbl" style="margin-top:1.4vh">Say</span>Her twin has learned from 21 of her own meals: carb sensitivity 0.44, peaking at 65 minutes, slower than the population's forty-five. Note the alarm says 24%, green, stable. But she's about to eat. Rice first — 146, that crosses. Dal and sabzi first — 135, she stays under. Same food, same patient, same afternoon — on a patient the alarm had already called stable. That is something a classifier alone cannot give you. And on "After the meal": a real meal she ate on the 29th of February. The generic twin predicted 182. Her own twin predicted 148. The sensor recorded 147.</div>
+  <div class="shotwrap">
+    <img src="shots/10_plan_crop.png" alt="Plan a meal — eating order">
+    <div class="side">
+      <p>The alarm had just called her <b>24%, green, stable</b>. Nothing here needed a doctor.</p>
+      <span class="callout co-red">Rice first · 146</span>
+      <p style="margin-top:-.4vh">crosses 140</p>
+      <span class="callout co-aqua">Dal &amp; sabzi first · 135</span>
+      <p style="margin-top:-.4vh">stays under</p>
+      <p>Her twin: <b>k = 0.44</b> mg/dL per g, peak at <b>65 min</b> — learned from <b>21 of her own meals</b>.</p>
+    </div>
+  </div>
+  <div class="note"><span class="lbl">Say</span>Here is where the twin earns its place. Patient five — her HbA1c is 5.7, real, in the prediabetes range. Her twin has learned from twenty-one of her own meals: carb sensitivity 0.44, peaking at sixty-five minutes, slower than the population's forty-five. Now look at the status: the alarm says twenty-four percent, green, stable. Nothing here needs a doctor. But she's about to eat rice, dal and sabzi. Rice first — projected peak 146, that crosses the line. Dal and sabzi first — 135, she stays under. Same food, same patient, same afternoon, and about ten milligrams per decilitre between crossing and not — on a patient the alarm had already called stable. That is something a classifier alone cannot give you.</div>
 </section>
 
 <!-- 16 -->
@@ -328,14 +345,19 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
 <section class="slide">
   <div class="eyebrow">Women's-health module</div>
   <h2>Insulin sensitivity falls in the luteal phase — and this cohort can't show it</h2>
-  <ul>
-    <li>The same meal peaks higher in the second half of the cycle. For prediabetes screening in India, where most of those screened are women, that matters.</li>
-    <li><b>But the BIG IDEAs study enrolled only post-menopausal females.</b> All 9 women here are post-menopausal. <b>None has a cycle.</b></li>
-    <li>So it ships as a <b>labelled capability demonstration</b>, behind a warning, defaulting to "Not applicable".</li>
-    <li>Demo effect: vegetables-first goes <b>135 → 141</b>. The same advice stops working.</li>
-  </ul>
-  <p class="lede">The dataset that <i>would</i> let the twin learn this: <b>mcPHASES</b> (PhysioNet) — 42 women,
-  ~3 months each, daily LH/E3G/PdG assays with labelled phases. In future work.</p>
+  <div class="shotwrap">
+    <img src="shots/11_luteal_crop.png" alt="Cycle phase module, luteal selected">
+    <div class="side">
+      <p><b>The BIG IDEAs study enrolled only post-menopausal females.</b> All 9 women here are
+      post-menopausal. <b>None has a cycle.</b></p>
+      <p>So it ships as a <b>labelled capability demo</b>, behind that warning, defaulting to
+      "Not applicable".</p>
+      <span class="callout co-amber">135 → 141</span>
+      <p style="margin-top:-.4vh">vegetables-first, follicular → luteal. The same advice stops working.</p>
+      <p><b>mcPHASES</b> (PhysioNet, 42 women, ~3 months, daily hormone assays) is the dataset that
+      would let the twin <i>learn</i> this.</p>
+    </div>
+  </div>
   <div class="note"><span class="lbl">Say</span>One more module, with a caveat I want to say out loud. Insulin sensitivity falls in the luteal phase, so the same meal peaks higher. But read the warning — this study enrolled only post-menopausal females. Every woman in this dataset is post-menopausal; none of them has a cycle. So this control isn't telling you anything about this patient. It's a capability demonstration. To actually learn it you'd need mcPHASES — forty-two women, three months each, daily hormone assays. That's in my future work.</div>
 </section>
 
@@ -387,7 +409,36 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   <div class="note"><span class="lbl">Say</span>What I think this does show: that fusing a health record with wearable streams beats glucose alone — 0.612 to 0.728 — and cuts a basic CGM alarm's 6.8 false alarms a day down to about two. That a physiological twin can learn a person meal by meal and get 22% better at predicting their peaks. And that the result is a tool which doesn't just say "she will spike", but "if she eats the dal before the rice, she won't." Thank you for watching.</div>
 </section>
 
-<!-- 21 -->
+<!-- 21  HANDOFF: play the clip -->
+<section class="slide demo">
+  <span class="pill demo">▶ Play the 21-second clip now</span>
+  <h2>GlucoTwin in twenty-one seconds</h2>
+  <ul>
+    <li>Switch to <code>brag-output/brag.mp4</code> and play it full screen, with sound.</li>
+    <li>Then come straight back here and move to the live demo.</li>
+  </ul>
+  <div class="note"><span class="lbl">Do</span>Alt-tab to the video. Play it full screen with sound. Come back when it ends.
+  <span class="lbl" style="margin-top:1.4vh">Say before</span>Before I show you the system running, here it is in twenty-one seconds.
+  <span class="lbl" style="margin-top:1.4vh">Say after</span>Everything in that clip is the real dashboard, and every number in it comes from the artifacts in the repository. Let me now show you the same thing live, so you can see it is not a video trick.</div>
+</section>
+
+<!-- 22  HANDOFF: live demo -->
+<section class="slide demo">
+  <span class="pill demo">→ Switch to the dashboard</span>
+  <h2>Live demo — five minutes</h2>
+  <ul>
+    <li><b>Ward overview</b> · day 3, 20:00 · cohort filter → Women 9</li>
+    <li><b>Patient twin</b> → P-005 · day 3 · 16:00 · reasons + timeline</li>
+    <li><b>Plan a meal</b> → Rice + dal + sabzi → the three orders → largest safe portion</li>
+    <li><b>Build your own</b> / <b>Describe it in words</b> → <b>After the meal</b> → meal 7</li>
+    <li><b>Cycle phase</b> → read the warning → Luteal</li>
+    <li><b>Model performance</b> → ablation + per-meal table</li>
+  </ul>
+  <div class="note"><span class="lbl">Do</span>Alt-tab to Chrome. Follow the live-demo script in docs/VIDEO_SCRIPT.md, part 3.
+  <span class="lbl" style="margin-top:1.4vh">Say</span>Let me show you it running. Nothing here is pre-recorded — this is the dashboard on my machine, reading the artifacts the pipeline produced.</div>
+</section>
+
+<!-- 23 -->
 <section class="slide title">
   <div class="eyebrow">Thank you</div>
   <h1>GlucoTwin</h1>
@@ -400,7 +451,7 @@ kbd{font-family:var(--f-num);font-size:.92em;border:1px solid var(--line);border
   <div class="note"><span class="lbl">Say</span>Thank you for watching. Everything — the code, the data provenance, every result, and the leakage test — is in the repository.</div>
 </section>
 
-<div class="hud"><b id="cur">1</b> / <span id="tot">21</span></div>
+<div class="hud"><b id="cur">1</b> / <span id="tot">23</span></div>
 <div class="help"><kbd>→</kbd> next · <kbd>←</kbd> back · <kbd>N</kbd> notes · <kbd>F</kbd> fullscreen</div>
 
 <script>

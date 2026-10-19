@@ -32,7 +32,7 @@ India has an estimated **101 million people with diabetes and 136 million with p
 
 ## 4. Demo video
 
-▶️ **✏️ unlisted YouTube link** (≥ 20 minutes)
+▶️ **✏️ unlisted YouTube link** (15-20 minutes)
 
 ## 5. How it works
 
