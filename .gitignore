@@ -36,3 +36,8 @@ secrets.json
 
 # brag intermediates (631 PNG frames); the mp4/jpg/copy are kept
 brag-output/work/
+
+# Remotion explainer: captured footage and renders are not committed
+video/public/glimpses/
+video/out/
+video/node_modules/
