@@ -1,0 +1,13 @@
+A CGM tells you your glucose crossed 140. It tells you at the moment it happens.
+
+GlucoTwin warns two hours earlier — and says what would change it. It fuses a FHIR
+health record with CGM, wearable and meal data into a physiological twin per patient,
+then learns that patient meal by meal: predict the peak before they eat, compare with
+what the sensor recorded, re-fit.
+
+Across 431 real meals it cut the error in the predicted peak by 22%. And for one
+patient the alarm had already called stable: rice first, projected 146 — dal and sabzi
+first, 135. Same food, same afternoon, the difference between crossing the line and not.
+
+Built for the Happiest Health Digital Twin Challenge 2026. Open data, leave-one-subject-out,
+and a script that proves the twin never sees the future.

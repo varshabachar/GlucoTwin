@@ -33,3 +33,6 @@ artifacts_women/ehr/
 secrets.json
 # PhysioNet credentials for restricted datasets (mcPHASES)
 .physionet
+
+# brag intermediates (631 PNG frames); the mp4/jpg/copy are kept
+brag-output/work/
