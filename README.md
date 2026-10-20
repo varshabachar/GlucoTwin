@@ -7,6 +7,45 @@
 
 ---
 
+# 📍 Start here — every submission item, in one place
+
+### ▶️ 1. Demo video
+
+<a href="https://youtu.be/-KZf1KlB5NU">
+  <img src="https://i.ytimg.com/vi/-KZf1KlB5NU/hqdefault.jpg" width="420" alt="Play the GlucoTwin demo video on YouTube">
+</a>
+
+### **[Watch the demo video on YouTube →](https://youtu.be/-KZf1KlB5NU)**
+
+### 🌐 2. Live dashboard — try it yourself, right now
+
+### **[unoglucotwin.streamlit.app →](https://unoglucotwin.streamlit.app/)**
+
+Nothing to install and no data to download. It is the same dashboard shown in the video, running live.
+It is a free Streamlit app, so if you get a *"wake this app"* screen, give it about 40 seconds.
+
+### 📎 3. Documents
+
+| Document | Open it | Format |
+|---|---|---|
+| **Presentation** — project details and outcomes | **[`docs/presentation.pdf`](docs/presentation.pdf)** | PDF, 23 slides |
+| **Architecture diagram** | **[`docs/architecture.pdf`](docs/architecture.pdf)** | PDF · [preview below](#system-architecture) |
+| **Open-source licence** | **[`LICENSE`](LICENSE)** | MIT |
+| One-minute product tour (optional) | [`brag-output/showcase.mp4`](brag-output/showcase.mp4) | MP4, 1:08 |
+
+Both PDFs open straight in the browser — GitHub renders them inline, no download needed.
+
+### 📖 4. Where to read about the work
+
+**[§1 Team](#1-team-details)** · **[§3 Problem & use case](#3-problem-statement-and-healthcare-use-case)** ·
+**[§5 How it works](#5-how-it-works)** · **[§6 Stack & models](#6-technical-stack-and-models)** ·
+**[§7 Results](#7-results)** · **[§12 Limitations](#12-honest-limitations)**
+
+The table under [*Submission checklist*](#submission-checklist--where-each-required-item-lives) below maps
+every mandatory item to its exact section.
+
+---
+
 ## System architecture
 
 ![GlucoTwin system architecture](docs/architecture.png)
@@ -22,7 +61,8 @@ Section 5 adds a step-by-step walk through the same pipeline.</sub>
 </a>
 
 **[▶ Play the showcase — 1:08](brag-output/showcase.mp4)** · what the product does and who it is for, in a
-minute. The full **15-20 minute demo video** required for judging is in [section 4](#4-demo-video).
+minute. This is a bonus clip; the full demo video required for judging is
+at the top of this README and in [section 4](#4-demo-video).
 
 ---
 
@@ -37,7 +77,7 @@ minute. The full **15-20 minute demo video** required for judging is in [section
 | Healthcare use case | [§3](#3-problem-statement-and-healthcare-use-case) |
 | Technical stack | [§6](#6-technical-stack-and-models) |
 | AI/ML model or framework details | [§6](#6-technical-stack-and-models) (models, features, validation) · [§5](#5-how-it-works) (twin equation) · [§7](#7-results) (measured outcomes) |
-| 15-20 minute demo video, unlisted on YouTube | [§4](#4-demo-video) |
+| 15-20 minute demo video, unlisted on YouTube | **[youtu.be/-KZf1KlB5NU](https://youtu.be/-KZf1KlB5NU)** · [§4](#4-demo-video) |
 | Open-source licence details | [§15](#15-license) · [`LICENSE`](LICENSE) — MIT |
 | Architecture diagram (PDF) | [top of this README](#system-architecture) · [`docs/architecture.pdf`](docs/architecture.pdf) |
 | Presentation (PDF) covering details and outcomes | [`docs/presentation.pdf`](docs/presentation.pdf), 23 slides — see [§14](#14-presentation) |
@@ -73,7 +113,7 @@ India has an estimated **101 million people with diabetes and 136 million with p
 
 ## 4. Demo video
 
-▶️ **✏️ unlisted YouTube link — to be added** (15-20 minutes)
+▶️ **[Watch on YouTube — unlisted](https://youtu.be/-KZf1KlB5NU)**
 
 The video walks through the deck, a short clip of the running dashboard, and then a live demo on the
 real dashboard. Its run sheet and the spoken script are in [`docs/VIDEO_SCRIPT.md`](docs/VIDEO_SCRIPT.md).
